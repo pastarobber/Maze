@@ -1,0 +1,50 @@
+C:\Users\KTG\source\repos\AStar\AStar\bin\Debug\AStar.exe.config
+C:\Users\KTG\source\repos\AStar\AStar\bin\Debug\AStar.exe
+C:\Users\KTG\source\repos\AStar\AStar\bin\Debug\AStar.pdb
+C:\Users\KTG\source\repos\AStar\AStar\obj\Debug\AStar.csprojResolveAssemblyReference.cache
+C:\Users\KTG\source\repos\AStar\AStar\obj\Debug\AStar.Properties.Resources.resources
+C:\Users\KTG\source\repos\AStar\AStar\obj\Debug\AStar.csproj.GenerateResource.cache
+C:\Users\KTG\source\repos\AStar\AStar\obj\Debug\AStar.csproj.CoreCompileInputs.cache
+C:\Users\KTG\source\repos\AStar\AStar\obj\Debug\AStar.exe
+C:\Users\KTG\source\repos\AStar\AStar\obj\Debug\AStar.pdb
+C:\Users\KTG\source\repos\AStar\AStar\obj\Debug\AStar.MainForm.resources
+C:\Users\sjh\Desktop\강의 자료\AStarViewer-master\AStarViewer-master\AStar\bin\Debug\AStar.exe.config
+C:\Users\sjh\Desktop\강의 자료\AStarViewer-master\AStarViewer-master\AStar\bin\Debug\AStar.exe
+C:\Users\sjh\Desktop\강의 자료\AStarViewer-master\AStarViewer-master\AStar\bin\Debug\AStar.pdb
+C:\Users\sjh\Desktop\강의 자료\AStarViewer-master\AStarViewer-master\AStar\obj\Debug\AStar.csproj.AssemblyReference.cache
+C:\Users\sjh\Desktop\강의 자료\AStarViewer-master\AStarViewer-master\AStar\obj\Debug\AStar.MainForm.resources
+C:\Users\sjh\Desktop\강의 자료\AStarViewer-master\AStarViewer-master\AStar\obj\Debug\AStar.Properties.Resources.resources
+C:\Users\sjh\Desktop\강의 자료\AStarViewer-master\AStarViewer-master\AStar\obj\Debug\AStar.csproj.GenerateResource.cache
+C:\Users\sjh\Desktop\강의 자료\AStarViewer-master\AStarViewer-master\AStar\obj\Debug\AStar.csproj.CoreCompileInputs.cache
+C:\Users\sjh\Desktop\강의 자료\AStarViewer-master\AStarViewer-master\AStar\obj\Debug\AStar.exe
+C:\Users\sjh\Desktop\강의 자료\AStarViewer-master\AStarViewer-master\AStar\obj\Debug\AStar.pdb
+C:\Users\이미림\Desktop\AStarViewer-master\AStar\bin\Debug\AStar.exe.config
+C:\Users\이미림\Desktop\AStarViewer-master\AStar\bin\Debug\AStar.exe
+C:\Users\이미림\Desktop\AStarViewer-master\AStar\bin\Debug\AStar.pdb
+C:\Users\이미림\Desktop\AStarViewer-master\AStar\obj\Debug\AStar.csproj.AssemblyReference.cache
+C:\Users\이미림\Desktop\AStarViewer-master\AStar\obj\Debug\AStar.MainForm.resources
+C:\Users\이미림\Desktop\AStarViewer-master\AStar\obj\Debug\AStar.Properties.Resources.resources
+C:\Users\이미림\Desktop\AStarViewer-master\AStar\obj\Debug\AStar.csproj.GenerateResource.cache
+C:\Users\이미림\Desktop\AStarViewer-master\AStar\obj\Debug\AStar.csproj.CoreCompileInputs.cache
+C:\Users\이미림\Desktop\AStarViewer-master\AStar\obj\Debug\AStar.exe
+C:\Users\이미림\Desktop\AStarViewer-master\AStar\obj\Debug\AStar.pdb
+C:\Users\e1001\Desktop\c#\AStarViewer-master_통합\AStarViewer-master\AStar\bin\Debug\AStar.exe.config
+C:\Users\e1001\Desktop\c#\AStarViewer-master_통합\AStarViewer-master\AStar\bin\Debug\AStar.exe
+C:\Users\e1001\Desktop\c#\AStarViewer-master_통합\AStarViewer-master\AStar\bin\Debug\AStar.pdb
+C:\Users\e1001\Desktop\c#\AStarViewer-master_통합\AStarViewer-master\AStar\obj\Debug\AStar.csproj.AssemblyReference.cache
+C:\Users\e1001\Desktop\c#\AStarViewer-master_통합\AStarViewer-master\AStar\obj\Debug\AStar.MainForm.resources
+C:\Users\e1001\Desktop\c#\AStarViewer-master_통합\AStarViewer-master\AStar\obj\Debug\AStar.Properties.Resources.resources
+C:\Users\e1001\Desktop\c#\AStarViewer-master_통합\AStarViewer-master\AStar\obj\Debug\AStar.csproj.GenerateResource.cache
+C:\Users\e1001\Desktop\c#\AStarViewer-master_통합\AStarViewer-master\AStar\obj\Debug\AStar.csproj.CoreCompileInputs.cache
+C:\Users\e1001\Desktop\c#\AStarViewer-master_통합\AStarViewer-master\AStar\obj\Debug\AStar.exe
+C:\Users\e1001\Desktop\c#\AStarViewer-master_통합\AStarViewer-master\AStar\obj\Debug\AStar.pdb
+C:\Users\이미림\Desktop\AStarViewer-master\AStarViewer-master\AStar\bin\Debug\AStar.exe.config
+C:\Users\이미림\Desktop\AStarViewer-master\AStarViewer-master\AStar\bin\Debug\AStar.exe
+C:\Users\이미림\Desktop\AStarViewer-master\AStarViewer-master\AStar\bin\Debug\AStar.pdb
+C:\Users\이미림\Desktop\AStarViewer-master\AStarViewer-master\AStar\obj\Debug\AStar.csproj.AssemblyReference.cache
+C:\Users\이미림\Desktop\AStarViewer-master\AStarViewer-master\AStar\obj\Debug\AStar.MainForm.resources
+C:\Users\이미림\Desktop\AStarViewer-master\AStarViewer-master\AStar\obj\Debug\AStar.Properties.Resources.resources
+C:\Users\이미림\Desktop\AStarViewer-master\AStarViewer-master\AStar\obj\Debug\AStar.csproj.GenerateResource.cache
+C:\Users\이미림\Desktop\AStarViewer-master\AStarViewer-master\AStar\obj\Debug\AStar.csproj.CoreCompileInputs.cache
+C:\Users\이미림\Desktop\AStarViewer-master\AStarViewer-master\AStar\obj\Debug\AStar.exe
+C:\Users\이미림\Desktop\AStarViewer-master\AStarViewer-master\AStar\obj\Debug\AStar.pdb
