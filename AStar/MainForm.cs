@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace AStar
 {
@@ -16,7 +17,7 @@ namespace AStar
         // 길찾기 관련 상태 업데이트 타입을 정의한 열거형
         public enum UpdateType { None, Init, Create, Build, Move };
 
-        private bool _isCreated; // 맵 생성 여부
+        private bool _isCreated; // 맵 생성 여부 
         private bool _isStarted; // 길찾기 시작 여부
 
         private int _mapSizeX; // 맵의 X축 크기
@@ -34,7 +35,7 @@ namespace AStar
         private HashSet<Point> _toggledTiles;
         private Tile _start, _end;
         private bool _isDrag;
-        private bool _heartShape, _rectShape;
+        private bool _heartShape, _rectShape, _rectempty;
         int _width, _height;
 
         /*------------------------------------------------------------------*/
@@ -77,7 +78,6 @@ namespace AStar
             _path = new List<Tile>();
             _openList = new List<Tile>();
             _closeList = new List<Tile>();
-            //_clickList = new List<Point>();
             _isDrag = false;
             _toggledTiles = new HashSet<Point>();
 
@@ -91,6 +91,9 @@ namespace AStar
 
             _rectShape = false;
             _heartShape = false;
+
+            numericUpDown_x.Maximum = 99;
+            numericUpDown_y.Maximum = 99;
 
             // 맵을 초기화
             UpdateMap(UpdateType.Init);
@@ -159,8 +162,6 @@ namespace AStar
             {
                 for (int y = 0; y < _mapSizeY; y++)
                 {
-                    //int locWidth = (x + 1) * _width;
-                    //int locHeight = (y + 1) * _height;
                     // 타일 객체 생성 및 좌표 설정
                     var loc = new Tile()
                     {
@@ -172,7 +173,7 @@ namespace AStar
                 }
             }
             _start = _tiles[0]; // 시작 타일 설정
-            _end = _tiles[_tiles.Count - 1]; // 항상 바뀌니까 카운트해서 -1
+            _end = _tiles[_tiles.Count - 1]; // 마지막 타일 설정 (항상 바뀌니까 카운트해서 -1)
         }
 
         // "시작" 버튼을 클릭했을 때 호출
@@ -181,7 +182,7 @@ namespace AStar
             if (!_isCreated) return; // 맵이 생성되지 않았다면 길찾기 시작 불가
 
             // 기존 길찾기 정보 초기화
-            _tiles.ForEach(o => o.Text = null);
+            _tiles.ForEach(o => o.Text = null); //_tiles 리스트의 각 타일 객체를 순차적으로 o라는 이름으로 받아서, 그 타일의 Text 속성을 null로 설정하는 역할
             _openList.Clear();
             _closeList.Clear();
             _path.Clear();
@@ -194,6 +195,8 @@ namespace AStar
             {
                 if (_openList.Count == 0) break; // open 리스트가 비어 있으면 종료
 
+                // OrderBy는 C#에서 LINQ (Language Integrated Query)의 메서드 중 하나로, 컬렉션을 정렬하는 데 사용됩니다.
+                // OrderBy는 지정된 조건에 따라 오름차순으로 요소들을 정렬합니다.
                 tile = _openList.OrderBy(o => o.F).First(); // F 값이 가장 낮은 타일 선택
                 _openList.Remove(tile); // open 리스트에서 제거
                 _closeList.Add(tile); // close 리스트에 추가
@@ -207,15 +210,15 @@ namespace AStar
                     if (_closeList.Contains(target)) continue; // 이미 close 리스트에 있는 타일은 패스
                     if (!IsNearLoc(tile, target)) continue; // 인접하지 않은 타일은 패스
 
-                    if (!_openList.Contains(target))
+                    if (!_openList.Contains(target)) // target이 없으면
                     {
                         _openList.Add(target); // 새로운 타일을 open 리스트에 추가
-                        target.Execute(tile, endTile); // 타일 업데이트
+                        target.Execute(tile, endTile); // 각 타일의 F, G, H 값을 계산하고 경로 정보를 업데이트하는 데 사용
                     }
-                    else
+                    else // 이미 오픈리스트에 있으면
                     {   // G 값이 더 작은 경우 타일을 업데이트
-                        if (Tile.CalcGValue(tile, target) < target.G)
-                        {
+                        if (Tile.CalcGValue(tile, target) < target.G) // G 값을 계산하는 정적 메서드
+                        { // 타일을 업데이트할 때 G 값을 비교하는 이유는 더 최적화된 경로를 찾기 위해
                             target.Execute(tile, endTile);
                         }
                     }
@@ -261,7 +264,7 @@ namespace AStar
                 // 초기화 상태일 때 맵에 초기 안내 메시지를 출력
                 case UpdateType.Init:
                     // 안내 메시지를 정의
-                    string waitMsg = "1.맵 크기 설정 (범위: 3<홀수<100)\r\n2.Create 클릭\r\n3.맵에 마우스 좌클릭하여 장애물 생성\r\n4.Start 클릭" +
+                    string waitMsg = "1.맵 크기 설정 (범위: 2<홀수<100)\r\n2.Create 클릭\r\n3.맵에 마우스 좌클릭하여 장애물 생성\r\n4.Start 클릭" +
                         "\r\n5.메뉴바에서 원하는 모양 선택시 도장 찍기 가능\r\n6.Random 버튼 클릭시 미로가 랜덤으로 생성됨";
                     // 맵의 크기를 계산
                     int width = pictureBox_map.Size.Width - 10;
@@ -334,23 +337,23 @@ namespace AStar
 
             MazeGenerator mazeGen = new MazeGenerator(_tiles, _mapSizeY, _mapSizeX);
             mazeGen.GenerateMaze(out _start, out _end);
+            // out은 C#에서 메서드의 매개변수를 정의할 때 사용하는 키워드로, 해당 매개변수를 통해 메서드에서 값을 반환할 수 있도록 해줍니다. 
 
             _isCreated = true;
             UpdateMap(UpdateType.Build);
         }
 
-        // 맵을 클릭하여 장애물 추가/삭제
+        // 맵을 클릭하여 장애물 추가/삭제(토글)
         private void pictureBox_map_MouseDown(object sender, MouseEventArgs e)
         {
             HandleMouseAction(e.Location, true);
         }
-
-        // 마우스가 움직일 때 호출되는 메서드
+        // 마우스가 드래그(움직일 때) 호출되는 메서드
         private void pictureBox_map_MouseMove(object sender, MouseEventArgs e)
         {
             HandleMouseAction(e.Location, false);
         }
-        // 마우스를 뗄 때 호출되는 메서드
+        // 마우스클릭을 뗄 때 호출되는 메서드
         private void pictureBox_map_MouseUp(object sender, MouseEventArgs e)
         {
             if (!_isCreated || _isStarted) return; // 맵이 생성되지 않았거나 길찾기가 시작되었으면 무시
@@ -363,11 +366,13 @@ namespace AStar
             }
         }
 
+        // 사용자가 마우스를 클릭하거나 드래그할 때 특정 작업을 수행하는 메서드
         private void HandleMouseAction(Point mousePos, bool isOnceClicked)
-        {
+        {   // 현재 마우스 포인터의 위치를 나타내는 점, 마우스가 한 번 클릭되었는지 여부를 나타내는 불리언 값
+        
             if (!_isCreated || _isStarted) return; // 맵이 생성되지 않았거나 길찾기가 시작되었으면 무시
 
-            Point pos = ConverRelativePos(mousePos);
+            Point pos = ConverRelativePos(mousePos); // mousePos를 상대 좌표로 변환한 후, 해당 위치가 유효한지 검사
             if (!IsInBound(pos)) return; // 마우스가 picture box 밖을 클릭했으면 무시
 
             if (_rectShape && isOnceClicked)
@@ -378,12 +383,12 @@ namespace AStar
             {
                 // 추후 작성
             }
-            else if (isOnceClicked)//마우스 한번만 눌렸을 때
+            else if (isOnceClicked) //마우스 한번만 클릭 했을 때
             {
                 _isDrag = true;
                 CreateSingleObstacle(pos);
             }
-            else if (_isDrag)//클릭후 moving(drag 이벤트)
+            else if (_isDrag) // 클릭 후 moving(drag 이벤트)
             {
                 CreateSingleObstacle(pos);
             }
@@ -397,42 +402,50 @@ namespace AStar
             if (!_toggledTiles.Contains(pos))
             {
                 int x = pos.X, y = pos.Y;
-                _tiles[x * _mapSizeY + y].IsBlock = true;
+                _tiles[x * _mapSizeY + y].IsBlock = !_tiles[x * _mapSizeY + y].IsBlock;
                 _toggledTiles.Add(pos); // 토글된 타일 기록
             }
 
             UpdateMap(UpdateType.Build);
         }
 
+        // 사용자가 선택한 위치(pos)를 중심으로 사각형 장애물을 생성
         private void CreateRectObstacle(Point pos)
-        {
+        { // 오프셋(offset)은 주어진 기준점 또는 위치에서의 상대적인 거리나 위치를 나타내는 용어
+            // 장애물을 만들기 위한 상대적인 오프셋 배열
             Point[] relativeOffsets = { new Point(-1,-1), new Point(0, -1) ,new Point(1, -1), // 위쪽 3개
                                 new Point(-1,0),  new Point(0,0),  new Point(1,0),  // 중앙 3개
                                 new Point(-1,1),  new Point(0,1),  new Point(1,1) }; // 아래쪽 3개
 
-            foreach (var offset in relativeOffsets)
+            foreach (var offset in relativeOffsets) // 각 오프셋에 대해
             {
-                Point tilePos = new Point(pos.X + offset.X, pos.Y + offset.Y);
-                if (!IsInBound(tilePos)) continue;
+                Point tilePos = new Point(pos.X + offset.X, pos.Y + offset.Y); // 현재 타일의 위치 계산
+                if (!IsInBound(tilePos)) continue; // 타일 위치가 맵의 경계 내에 있는지 확인
 
+                // 유효한 위치라면 타일을 장애물로 설정
                 int x = tilePos.X, y = tilePos.Y;
                 _tiles[x * _mapSizeY + y].IsBlock = true; // 타일을 장애물로 설정
             }
 
             UpdateMap(UpdateType.Build);
         }
-
-        private void tool_full_heart_Click(object sender, EventArgs e)
-        {
-            _heartShape = !_heartShape;
-        }
-
+        
         private void tool_full_square_Click(object sender, EventArgs e)
         {
             _rectShape = !_rectShape;
         }
 
+        private void tool_empty_square_Click(object sender, EventArgs e)
+        {
+            _rectempty = !_rectempty;
+        }
+
+        private void tool_full_heart_Click(object sender, EventArgs e)
+        {
+            _heartShape = !_heartShape;
+        }
         #endregion
+
 
         #region Private Method
         // 맵을 갱신하는 메서드
@@ -452,11 +465,13 @@ namespace AStar
             return diffX <= 1 && diffY <= 1; // 차이가 1 이하면 인접한 것으로 판단
         }
 
+        // 마우스 클릭 위치(mousePos)를 현재 타일의 상대 좌표로 변환
         private Point ConverRelativePos(Point mousePos)
         {
             int x = (int)mousePos.X / _width, y = (int)mousePos.Y / _height;
-            return new Point(x,y);
+            return new Point(x,y); // 계산된 타일 인덱스를 Point 객체로 반환
         }
+        // 주어진 좌표(pos)가 현재 맵의 경계 내에 있는지를 확인
         private bool IsInBound(Point pos)
         {
             if (pos.X < 0 || pos.Y < 0 ||
@@ -466,6 +481,7 @@ namespace AStar
         }
         #endregion
 
+        // 창 닫기
         private void button_close_Click(object sender, EventArgs e)
         {
             this.Close();

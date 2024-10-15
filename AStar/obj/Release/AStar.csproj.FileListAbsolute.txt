@@ -8,3 +8,13 @@ C:\Users\KTG\source\repos\AStar\AStar\obj\Release\AStar.csproj.GenerateResource.
 C:\Users\KTG\source\repos\AStar\AStar\obj\Release\AStar.csproj.CoreCompileInputs.cache
 C:\Users\KTG\source\repos\AStar\AStar\obj\Release\AStar.exe
 C:\Users\KTG\source\repos\AStar\AStar\obj\Release\AStar.pdb
+C:\Users\이미림\Desktop\AStarViewer-master\AStarViewer-master\AStar\bin\Release\AStar.exe.config
+C:\Users\이미림\Desktop\AStarViewer-master\AStarViewer-master\AStar\bin\Release\AStar.exe
+C:\Users\이미림\Desktop\AStarViewer-master\AStarViewer-master\AStar\bin\Release\AStar.pdb
+C:\Users\이미림\Desktop\AStarViewer-master\AStarViewer-master\AStar\obj\Release\AStar.csproj.AssemblyReference.cache
+C:\Users\이미림\Desktop\AStarViewer-master\AStarViewer-master\AStar\obj\Release\AStar.MainForm.resources
+C:\Users\이미림\Desktop\AStarViewer-master\AStarViewer-master\AStar\obj\Release\AStar.Properties.Resources.resources
+C:\Users\이미림\Desktop\AStarViewer-master\AStarViewer-master\AStar\obj\Release\AStar.csproj.GenerateResource.cache
+C:\Users\이미림\Desktop\AStarViewer-master\AStarViewer-master\AStar\obj\Release\AStar.csproj.CoreCompileInputs.cache
+C:\Users\이미림\Desktop\AStarViewer-master\AStarViewer-master\AStar\obj\Release\AStar.exe
+C:\Users\이미림\Desktop\AStarViewer-master\AStarViewer-master\AStar\obj\Release\AStar.pdb

@@ -37,8 +37,9 @@
             this.button_createMap = new System.Windows.Forms.Button();
             this.button_start = new System.Windows.Forms.Button();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
-            this.tool_full_heart = new System.Windows.Forms.ToolStripMenuItem();
             this.tool_full_square = new System.Windows.Forms.ToolStripMenuItem();
+            this.tool_full_heart = new System.Windows.Forms.ToolStripMenuItem();
+            this.tool_empty_square = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_map)).BeginInit();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_y)).BeginInit();
@@ -152,13 +153,20 @@
             this.menuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.tool_full_square,
-            this.tool_full_heart});
+            this.tool_full_heart,
+            this.tool_empty_square});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Padding = new System.Windows.Forms.Padding(6, 2, 0, 2);
             this.menuStrip1.Size = new System.Drawing.Size(1184, 28);
             this.menuStrip1.TabIndex = 2;
             this.menuStrip1.Text = "menuStrip1";
+            // 
+            // tool_full_square
+            // 
+            this.tool_full_square.Name = "tool_full_square";
+            this.tool_full_square.Size = new System.Drawing.Size(38, 24);
+            this.tool_full_square.Text = "■";
+            this.tool_full_square.Click += new System.EventHandler(this.tool_full_square_Click);
             // 
             // tool_full_heart
             // 
@@ -167,12 +175,12 @@
             this.tool_full_heart.Text = "♥";
             this.tool_full_heart.Click += new System.EventHandler(this.tool_full_heart_Click);
             // 
-            // tool_full_square
+            // tool_empty_square
             // 
-            this.tool_full_square.Name = "tool_full_square";
-            this.tool_full_square.Size = new System.Drawing.Size(38, 24);
-            this.tool_full_square.Text = "■";
-            this.tool_full_square.Click += new System.EventHandler(this.tool_full_square_Click);
+            this.tool_empty_square.Name = "tool_empty_square";
+            this.tool_empty_square.Size = new System.Drawing.Size(38, 24);
+            this.tool_empty_square.Text = "□";
+            this.tool_empty_square.Click += new System.EventHandler(this.tool_empty_square_Click);
             // 
             // MainForm
             // 
@@ -211,6 +219,7 @@
         private System.Windows.Forms.ToolStripMenuItem tool_full_heart;
         private System.Windows.Forms.ToolStripMenuItem tool_full_square;
         private System.Windows.Forms.Button button_randMap;
+        private System.Windows.Forms.ToolStripMenuItem tool_empty_square;
     }
 }
 

@@ -62,6 +62,7 @@ namespace AStar
             int diffY = Math.Abs(parent.Y - current.Y); // 부모 타일과 현재 타일의 Y 좌표 차이 계산
             int value = 10; // 기본 이동 비용은 10 (수직 또는 수평 이동 시)
 
+            // x, y 좌표 차이
             if (diffX == 1 && diffY == 0) value = 10; // 만약 타일이 수평으로 인접해 있을 경우 이동 비용은 10
             else if (diffX == 0 && diffY == 1) value = 10; // 만약 타일이 수직으로 인접해 있을 경우 이동 비용은 10
             else if (diffX == 1 && diffY == 1) value = 14; // 만약 타일이 대각선으로 인접해 있을 경우 이동 비용은 14 (대각선 이동은 더 많은 비용이 듦)
