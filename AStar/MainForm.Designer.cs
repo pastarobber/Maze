@@ -39,7 +39,7 @@
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.tool_full_square = new System.Windows.Forms.ToolStripMenuItem();
             this.tool_full_heart = new System.Windows.Forms.ToolStripMenuItem();
-            this.tool_empty_square = new System.Windows.Forms.ToolStripMenuItem();
+            this.tool_Eraser = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_map)).BeginInit();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_y)).BeginInit();
@@ -50,10 +50,10 @@
             // pictureBox_map
             // 
             this.pictureBox_map.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pictureBox_map.Location = new System.Drawing.Point(114, 28);
+            this.pictureBox_map.Location = new System.Drawing.Point(114, 30);
             this.pictureBox_map.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.pictureBox_map.Name = "pictureBox_map";
-            this.pictureBox_map.Size = new System.Drawing.Size(1070, 631);
+            this.pictureBox_map.Size = new System.Drawing.Size(1070, 629);
             this.pictureBox_map.TabIndex = 0;
             this.pictureBox_map.TabStop = false;
             this.pictureBox_map.Paint += new System.Windows.Forms.PaintEventHandler(this.pictureBox_map_Paint);
@@ -70,10 +70,10 @@
             this.panel1.Controls.Add(this.button_createMap);
             this.panel1.Controls.Add(this.button_start);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Left;
-            this.panel1.Location = new System.Drawing.Point(0, 28);
+            this.panel1.Location = new System.Drawing.Point(0, 30);
             this.panel1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(114, 631);
+            this.panel1.Size = new System.Drawing.Size(114, 629);
             this.panel1.TabIndex = 1;
             // 
             // button_randMap
@@ -154,33 +154,33 @@
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.tool_full_square,
             this.tool_full_heart,
-            this.tool_empty_square});
+            this.tool_Eraser});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1184, 28);
+            this.menuStrip1.Size = new System.Drawing.Size(1184, 30);
             this.menuStrip1.TabIndex = 2;
             this.menuStrip1.Text = "menuStrip1";
             // 
             // tool_full_square
             // 
             this.tool_full_square.Name = "tool_full_square";
-            this.tool_full_square.Size = new System.Drawing.Size(38, 24);
+            this.tool_full_square.Size = new System.Drawing.Size(38, 26);
             this.tool_full_square.Text = "■";
             this.tool_full_square.Click += new System.EventHandler(this.tool_full_square_Click);
             // 
             // tool_full_heart
             // 
             this.tool_full_heart.Name = "tool_full_heart";
-            this.tool_full_heart.Size = new System.Drawing.Size(38, 24);
+            this.tool_full_heart.Size = new System.Drawing.Size(38, 26);
             this.tool_full_heart.Text = "♥";
             this.tool_full_heart.Click += new System.EventHandler(this.tool_full_heart_Click);
             // 
-            // tool_empty_square
+            // tool_Eraser
             // 
-            this.tool_empty_square.Name = "tool_empty_square";
-            this.tool_empty_square.Size = new System.Drawing.Size(38, 24);
-            this.tool_empty_square.Text = "□";
-            this.tool_empty_square.Click += new System.EventHandler(this.tool_empty_square_Click);
+            this.tool_Eraser.Name = "tool_Eraser";
+            this.tool_Eraser.Size = new System.Drawing.Size(68, 26);
+            this.tool_Eraser.Text = "지우개";
+            this.tool_Eraser.Click += new System.EventHandler(this.tool_Eraser_Click);
             // 
             // MainForm
             // 
@@ -219,7 +219,7 @@
         private System.Windows.Forms.ToolStripMenuItem tool_full_heart;
         private System.Windows.Forms.ToolStripMenuItem tool_full_square;
         private System.Windows.Forms.Button button_randMap;
-        private System.Windows.Forms.ToolStripMenuItem tool_empty_square;
+        private System.Windows.Forms.ToolStripMenuItem tool_Eraser;
     }
 }
 

@@ -35,7 +35,7 @@ namespace AStar
         private HashSet<Point> _toggledTiles;
         private Tile _start, _end;
         private bool _isDrag;
-        private bool _heartShape, _rectShape, _rectempty;
+        private bool _heartShape, _rectShape, _isEraser;
         int _width, _height;
 
         /*------------------------------------------------------------------*/
@@ -264,8 +264,8 @@ namespace AStar
                 // 초기화 상태일 때 맵에 초기 안내 메시지를 출력
                 case UpdateType.Init:
                     // 안내 메시지를 정의
-                    string waitMsg = "1.맵 크기 설정 (범위: 2<홀수<100)\r\n2.Create 클릭\r\n3.맵에 마우스 좌클릭하여 장애물 생성\r\n4.Start 클릭" +
-                        "\r\n5.메뉴바에서 원하는 모양 선택시 도장 찍기 가능\r\n6.Random 버튼 클릭시 미로가 랜덤으로 생성됨";
+                    string waitMsg = "1.맵 크기 설정 (범위: 2<홀수<100)\r\n2.Create 클릭\r\n3.맵에 마우스 좌클릭하여 장애물(벽) 생성\r\n4.Start 클릭" +
+                        "\r\n5.메뉴바에서 네모/하트 도장 찍기 가능\r\n6.메뉴바에 지우개 기능이 있음(5*5)\r\n7.Random 버튼 클릭시 미로가 랜덤으로 생성됨";
                     // 맵의 크기를 계산
                     int width = pictureBox_map.Size.Width - 10;
                     int height = pictureBox_map.Size.Height - 10;
@@ -381,68 +381,107 @@ namespace AStar
             }
             else if (_heartShape && isOnceClicked)
             {
-                // 추후 작성
+                CreateHeartObstacle(pos);
             }
             else if (isOnceClicked) //마우스 한번만 클릭 했을 때
             {
                 _isDrag = true;
-                CreateSingleObstacle(pos);
+                UpdateSingleTIle(pos);
             }
             else if (_isDrag) // 클릭 후 moving(drag 이벤트)
             {
-                CreateSingleObstacle(pos);
+                UpdateSingleTIle(pos);
             }
+            
+            //위에 Create~ 함수들에서 만약에 그려지면 true, 안그려지면 false리턴해서
+            //그려졌을때만 Update하는식으로 수정해도 됨.
+            UpdateMap(UpdateType.Build);
         }
 
         // 마우스 좌표를 기반으로 장애물 타일을 그리는 메서드
-        private void CreateSingleObstacle(Point pos)
+        private void UpdateSingleTIle(Point pos)
         {
             // 모든 타일을 순회하여 마우스 좌표가 해당 타일 영역 안에 있는지 확인
             // 이미 토글된 타일이 아닌 경우
             if (!_toggledTiles.Contains(pos))
             {
-                int x = pos.X, y = pos.Y;
-                _tiles[x * _mapSizeY + y].IsBlock = !_tiles[x * _mapSizeY + y].IsBlock;
+                Tile target = FindTile(pos);
+                if (_isEraser)
+                    EraseBlockedTile(pos);
+                else
+                    target.IsBlock = !target.IsBlock;
                 _toggledTiles.Add(pos); // 토글된 타일 기록
             }
-
-            UpdateMap(UpdateType.Build);
         }
+            
+        private void UpdatePolyTile(Point pos, Point[] offsets, bool blockState)
+        {
+            foreach (var off in offsets) // 각 오프셋에 대해
+            {
+                Point tilePos = new Point(pos.X + off.X, pos.Y + off.Y); // 현재 타일의 위치 계산
+                if (!IsInBound(tilePos)) continue; // 타일 위치가 맵의 경계 밖이거나, 이미 벽인경우 continue
 
+                Tile target = FindTile(tilePos);
+                if (target.IsBlock == blockState) continue;
+                // 유효한 위치라면 타일을 장애물로 설정
+                target.IsBlock = blockState;
+            }
+        }
         // 사용자가 선택한 위치(pos)를 중심으로 사각형 장애물을 생성
         private void CreateRectObstacle(Point pos)
         { // 오프셋(offset)은 주어진 기준점 또는 위치에서의 상대적인 거리나 위치를 나타내는 용어
             // 장애물을 만들기 위한 상대적인 오프셋 배열
-            Point[] relativeOffsets = { new Point(-1,-1), new Point(0, -1) ,new Point(1, -1), // 위쪽 3개
+            Point[] offsets = { new Point(-1,-1), new Point(0, -1) ,new Point(1, -1), // 위쪽 3개
                                 new Point(-1,0),  new Point(0,0),  new Point(1,0),  // 중앙 3개
                                 new Point(-1,1),  new Point(0,1),  new Point(1,1) }; // 아래쪽 3개
 
-            foreach (var offset in relativeOffsets) // 각 오프셋에 대해
-            {
-                Point tilePos = new Point(pos.X + offset.X, pos.Y + offset.Y); // 현재 타일의 위치 계산
-                if (!IsInBound(tilePos)) continue; // 타일 위치가 맵의 경계 내에 있는지 확인
-
-                // 유효한 위치라면 타일을 장애물로 설정
-                int x = tilePos.X, y = tilePos.Y;
-                _tiles[x * _mapSizeY + y].IsBlock = true; // 타일을 장애물로 설정
-            }
-
-            UpdateMap(UpdateType.Build);
+            UpdatePolyTile(pos, offsets, blockState: true);
         }
-        
+
+        // 사용자가 선택한 위치(pos)를 중심으로 하트모양 장애물을 생성
+        private void CreateHeartObstacle(Point pos)
+        { 
+            Point[] offsets = {new Point(-1,-2),new Point(1,-2), // 2개
+                                new Point(-2,-1), new Point(-1,-1), new Point(0, -1) ,new Point(1, -1), new Point(2,-1), // 5개
+                                new Point(-2,0), new Point(-1,0),  new Point(0,0),  new Point(1,0), new Point(2,0),  // 5개
+                                new Point(-1,1),  new Point(0,1),  new Point(1,1), // 3개
+                                new Point(0,2)}; // 1개
+            UpdatePolyTile(pos, offsets, blockState: true);
+        }
+        private void EraseBlockedTile(Point pos)
+        { 
+            Point[] offsets = {new Point(-2,-2), new Point(-1,-2), new Point(0,-2), new Point(1,-2), new Point(2,-2), // 5개
+                                new Point(-2,-1), new Point(-1,-1), new Point(0, -1), new Point(1, -1), new Point(2,-1), // 5개
+                                new Point(-2,0), new Point(-1,0), new Point(0,0), new Point(1,0), new Point(2,0),  // 5개
+                                new Point(-2,1),  new Point(-1,1), new Point(0,1), new Point(1,1), new Point(2,1),  // 5개
+                                new Point(-2,2),  new Point(-1,2), new Point(0,2), new Point(1,2), new Point(2,2) }; // 5개
+            UpdatePolyTile(pos, offsets, blockState: false);
+        }
+
         private void tool_full_square_Click(object sender, EventArgs e)
         {
             _rectShape = !_rectShape;
-        }
-
-        private void tool_empty_square_Click(object sender, EventArgs e)
-        {
-            _rectempty = !_rectempty;
+            ToggleBtnHandler(rectShape: _rectShape);
         }
 
         private void tool_full_heart_Click(object sender, EventArgs e)
         {
             _heartShape = !_heartShape;
+            ToggleBtnHandler(heartShape: _heartShape);
+        }
+
+        private void tool_Eraser_Click(object sender, EventArgs e)
+        {
+            _isEraser = !_isEraser;
+            ToggleBtnHandler(erase: _isEraser);
+        }
+
+        private void ToggleBtnHandler(bool rectShape = false, bool heartShape = false, bool erase = false)
+        {
+            // 공통 동작: 다른 기능들을 비활성화
+            _isEraser = erase;
+            _rectShape = rectShape;
+            _heartShape = heartShape;
         }
         #endregion
 
@@ -471,6 +510,8 @@ namespace AStar
             int x = (int)mousePos.X / _width, y = (int)mousePos.Y / _height;
             return new Point(x,y); // 계산된 타일 인덱스를 Point 객체로 반환
         }
+
+
         // 주어진 좌표(pos)가 현재 맵의 경계 내에 있는지를 확인
         private bool IsInBound(Point pos)
         {
@@ -478,6 +519,11 @@ namespace AStar
                 pos.X >= _mapSizeX ||
                 pos.Y >= _mapSizeY) return false;
             return true;
+        }
+
+        private Tile FindTile(Point pos)
+        {
+            return _tiles[pos.X * _mapSizeY + pos.Y];
         }
         #endregion
 
