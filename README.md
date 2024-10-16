@@ -1,2 +1,0 @@
-# AStarViewer
-AStarViewer
