@@ -102,7 +102,7 @@ namespace AStar
         /*이 컨트롤은 숫자 값을 입력할 수 있게 해주는 UI 요소입니다. 
          * 사용자는 직접 숫자를 입력하거나, 위/아래 화살표 버튼을 사용하여 숫자 값을 증가 또는 감소시킬 수 있습니다.*/
         // X축 크기가 변경될 때 호출
-        private void numericUpDown_x_ValueChanged(object sender, EventArgs e)
+        private void NumericUpDown_x_ValueChanged(object sender, EventArgs e)
         {
             if (_isStarted)  // 길찾기가 시작된 상태라면 값을 변경하지 않음
             {
@@ -122,7 +122,7 @@ namespace AStar
         }
 
         // Y축 크기가 변경될 때 호출
-        private void numericUpDown_y_ValueChanged(object sender, EventArgs e)
+        private void NumericUpDown_y_ValueChanged(object sender, EventArgs e)
         {
             if (_isStarted) // 길찾기가 시작된 상태라면 값을 변경하지 않음
             {
@@ -139,14 +139,14 @@ namespace AStar
         }
 
         // "맵 생성" 버튼을 클릭했을 때 호출
-        private void button_createMap_Click(object sender, EventArgs e)
+        private void Button_createMap_Click(object sender, EventArgs e)
         {
-            createMap();
+            CreateMap();
             // 맵 업데이트
             UpdateMap(UpdateType.Create);
         }
 
-        private void createMap()
+        private void CreateMap()
         {
             if (_isStarted) return; // 길찾기가 시작된 상태라면 맵을 생성하지 않음
 
@@ -177,7 +177,7 @@ namespace AStar
         }
 
         // "시작" 버튼을 클릭했을 때 호출
-        private void button_start_Click(object sender, EventArgs e)
+        private void Button_start_Click(object sender, EventArgs e)
         {
             if (!_isCreated) return; // 맵이 생성되지 않았다면 길찾기 시작 불가
 
@@ -253,7 +253,7 @@ namespace AStar
         }
 
         // 맵을 다시 그리는 메서드
-        private void pictureBox_map_Paint(object sender, PaintEventArgs e)
+        private void PictureBox_map_Paint(object sender, PaintEventArgs e)
         {
             // 업데이트할 내용이 없으면 함수를 종료
             if (_updateType == UpdateType.None) return;
@@ -329,11 +329,11 @@ namespace AStar
             // 업데이트 타입을 None으로 설정하여 더 이상 그리지 않음
             _updateType = UpdateType.None;
         }
-        private void button_randMap_Click(object sender, EventArgs e) // 랜덤 생성
+        private void Button_randMap_Click(object sender, EventArgs e) // 랜덤 생성
         {
             if (_isStarted) return; // 길찾기가 시작된 상태라면 맵을 생성하지 않음
 
-            createMap();
+            CreateMap();
 
             MazeGenerator mazeGen = new MazeGenerator(_tiles, _mapSizeY, _mapSizeX);
             mazeGen.GenerateMaze(out _start, out _end);
@@ -344,17 +344,17 @@ namespace AStar
         }
 
         // 맵을 클릭하여 장애물 추가/삭제(토글)
-        private void pictureBox_map_MouseDown(object sender, MouseEventArgs e)
+        private void PictureBox_map_MouseDown(object sender, MouseEventArgs e)
         {
             HandleMouseAction(e.Location, true);
         }
         // 마우스가 드래그(움직일 때) 호출되는 메서드
-        private void pictureBox_map_MouseMove(object sender, MouseEventArgs e)
+        private void PictureBox_map_MouseMove(object sender, MouseEventArgs e)
         {
             HandleMouseAction(e.Location, false);
         }
         // 마우스클릭을 뗄 때 호출되는 메서드
-        private void pictureBox_map_MouseUp(object sender, MouseEventArgs e)
+        private void PictureBox_map_MouseUp(object sender, MouseEventArgs e)
         {
             if (!_isCreated || _isStarted) return; // 맵이 생성되지 않았거나 길찾기가 시작되었으면 무시
 
@@ -458,19 +458,19 @@ namespace AStar
             UpdatePolyTile(pos, offsets, blockState: false);
         }
 
-        private void tool_full_square_Click(object sender, EventArgs e)
+        private void Tool_full_square_Click(object sender, EventArgs e)
         {
             _rectShape = !_rectShape;
             ToggleBtnHandler(rectShape: _rectShape);
         }
 
-        private void tool_full_heart_Click(object sender, EventArgs e)
+        private void Tool_full_heart_Click(object sender, EventArgs e)
         {
             _heartShape = !_heartShape;
             ToggleBtnHandler(heartShape: _heartShape);
         }
 
-        private void tool_Eraser_Click(object sender, EventArgs e)
+        private void Tool_Eraser_Click(object sender, EventArgs e)
         {
             _isEraser = !_isEraser;
             ToggleBtnHandler(erase: _isEraser);
@@ -528,7 +528,7 @@ namespace AStar
         }
 
         // 창 닫기
-        private void button_close_Click(object sender, EventArgs e)
+        private void Button_close_Click(object sender, EventArgs e)
         {
             this.Close();
         }

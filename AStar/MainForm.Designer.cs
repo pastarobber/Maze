@@ -58,10 +58,10 @@
             this.pictureBox_map.Size = new System.Drawing.Size(1070, 631);
             this.pictureBox_map.TabIndex = 0;
             this.pictureBox_map.TabStop = false;
-            this.pictureBox_map.Paint += new System.Windows.Forms.PaintEventHandler(this.pictureBox_map_Paint);
-            this.pictureBox_map.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pictureBox_map_MouseDown);
-            this.pictureBox_map.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox_map_MouseMove);
-            this.pictureBox_map.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox_map_MouseUp);
+            this.pictureBox_map.Paint += new System.Windows.Forms.PaintEventHandler(this.PictureBox_map_Paint);
+            this.pictureBox_map.MouseDown += new System.Windows.Forms.MouseEventHandler(this.PictureBox_map_MouseDown);
+            this.pictureBox_map.MouseMove += new System.Windows.Forms.MouseEventHandler(this.PictureBox_map_MouseMove);
+            this.pictureBox_map.MouseUp += new System.Windows.Forms.MouseEventHandler(this.PictureBox_map_MouseUp);
             // 
             // panel1
             // 
@@ -87,7 +87,7 @@
             this.button_randMap.TabIndex = 5;
             this.button_randMap.Text = "Random";
             this.button_randMap.UseVisualStyleBackColor = true;
-            this.button_randMap.Click += new System.EventHandler(this.button_randMap_Click);
+            this.button_randMap.Click += new System.EventHandler(this.Button_randMap_Click);
             // 
             // button_close
             // 
@@ -98,7 +98,7 @@
             this.button_close.TabIndex = 4;
             this.button_close.Text = "close";
             this.button_close.UseVisualStyleBackColor = true;
-            this.button_close.Click += new System.EventHandler(this.button_close_Click);
+            this.button_close.Click += new System.EventHandler(this.Button_close_Click);
             // 
             // numericUpDown_y
             // 
@@ -112,7 +112,7 @@
             0,
             0,
             0});
-            this.numericUpDown_y.ValueChanged += new System.EventHandler(this.numericUpDown_y_ValueChanged);
+            this.numericUpDown_y.ValueChanged += new System.EventHandler(this.NumericUpDown_y_ValueChanged);
             // 
             // numericUpDown_x
             // 
@@ -126,7 +126,7 @@
             0,
             0,
             0});
-            this.numericUpDown_x.ValueChanged += new System.EventHandler(this.numericUpDown_x_ValueChanged);
+            this.numericUpDown_x.ValueChanged += new System.EventHandler(this.NumericUpDown_x_ValueChanged);
             // 
             // button_createMap
             // 
@@ -137,7 +137,7 @@
             this.button_createMap.TabIndex = 2;
             this.button_createMap.Text = "Create";
             this.button_createMap.UseVisualStyleBackColor = true;
-            this.button_createMap.Click += new System.EventHandler(this.button_createMap_Click);
+            this.button_createMap.Click += new System.EventHandler(this.Button_createMap_Click);
             // 
             // button_start
             // 
@@ -148,7 +148,7 @@
             this.button_start.TabIndex = 3;
             this.button_start.Text = "Start";
             this.button_start.UseVisualStyleBackColor = true;
-            this.button_start.Click += new System.EventHandler(this.button_start_Click);
+            this.button_start.Click += new System.EventHandler(this.Button_start_Click);
             // 
             // menuStrip1
             // 
@@ -170,21 +170,21 @@
             this.tool_full_square.Name = "tool_full_square";
             this.tool_full_square.Size = new System.Drawing.Size(38, 24);
             this.tool_full_square.Text = "■";
-            this.tool_full_square.Click += new System.EventHandler(this.tool_full_square_Click);
+            this.tool_full_square.Click += new System.EventHandler(this.Tool_full_square_Click);
             // 
             // tool_full_heart
             // 
             this.tool_full_heart.Name = "tool_full_heart";
             this.tool_full_heart.Size = new System.Drawing.Size(38, 24);
             this.tool_full_heart.Text = "♥";
-            this.tool_full_heart.Click += new System.EventHandler(this.tool_full_heart_Click);
+            this.tool_full_heart.Click += new System.EventHandler(this.Tool_full_heart_Click);
             // 
             // tool_Eraser
             // 
             this.tool_Eraser.Name = "tool_Eraser";
             this.tool_Eraser.Size = new System.Drawing.Size(68, 24);
             this.tool_Eraser.Text = "지우개";
-            this.tool_Eraser.Click += new System.EventHandler(this.tool_Eraser_Click);
+            this.tool_Eraser.Click += new System.EventHandler(this.Tool_Eraser_Click);
             // 
             // Tool_Start
             // 
