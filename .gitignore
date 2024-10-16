@@ -1,0 +1,24 @@
+# Build directories
+bin/
+obj/
+Debug/
+Release/
+
+# Visual Studio temporary files
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Debug files
+*.pdb
+*.ilk
+*.idb
+*.log
+
+# Others
+*.exe
+*.dll
+*.app
+*.apk
