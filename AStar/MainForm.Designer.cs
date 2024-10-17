@@ -40,8 +40,8 @@
             this.tool_full_square = new System.Windows.Forms.ToolStripMenuItem();
             this.tool_full_heart = new System.Windows.Forms.ToolStripMenuItem();
             this.tool_Eraser = new System.Windows.Forms.ToolStripMenuItem();
-            this.Tool_Start = new System.Windows.Forms.ToolStripMenuItem();
-            this.도착위치변경ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.Tool_Change_Start = new System.Windows.Forms.ToolStripMenuItem();
+            this.Tool_Change_End = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_map)).BeginInit();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_y)).BeginInit();
@@ -157,8 +157,8 @@
             this.tool_full_square,
             this.tool_full_heart,
             this.tool_Eraser,
-            this.Tool_Start,
-            this.도착위치변경ToolStripMenuItem});
+            this.Tool_Change_Start,
+            this.Tool_Change_End});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(1184, 28);
@@ -186,17 +186,19 @@
             this.tool_Eraser.Text = "지우개";
             this.tool_Eraser.Click += new System.EventHandler(this.Tool_Eraser_Click);
             // 
-            // Tool_Start
+            // Tool_Change_Start
             // 
-            this.Tool_Start.Name = "Tool_Start";
-            this.Tool_Start.Size = new System.Drawing.Size(123, 24);
-            this.Tool_Start.Text = "출발 위치 변경";
+            this.Tool_Change_Start.Name = "Tool_Change_Start";
+            this.Tool_Change_Start.Size = new System.Drawing.Size(123, 24);
+            this.Tool_Change_Start.Text = "출발 위치 변경";
+            this.Tool_Change_Start.Click += new System.EventHandler(this.Tool_Change_Start_Click);
             // 
-            // 도착위치변경ToolStripMenuItem
+            // Tool_Change_End
             // 
-            this.도착위치변경ToolStripMenuItem.Name = "도착위치변경ToolStripMenuItem";
-            this.도착위치변경ToolStripMenuItem.Size = new System.Drawing.Size(123, 24);
-            this.도착위치변경ToolStripMenuItem.Text = "도착 위치 변경";
+            this.Tool_Change_End.Name = "Tool_Change_End";
+            this.Tool_Change_End.Size = new System.Drawing.Size(123, 24);
+            this.Tool_Change_End.Text = "도착 위치 변경";
+            this.Tool_Change_End.Click += new System.EventHandler(this.Tool_Change_End_Click);
             // 
             // MainForm
             // 
@@ -236,8 +238,8 @@
         private System.Windows.Forms.ToolStripMenuItem tool_full_square;
         private System.Windows.Forms.Button button_randMap;
         private System.Windows.Forms.ToolStripMenuItem tool_Eraser;
-        private System.Windows.Forms.ToolStripMenuItem Tool_Start;
-        private System.Windows.Forms.ToolStripMenuItem 도착위치변경ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem Tool_Change_Start;
+        private System.Windows.Forms.ToolStripMenuItem Tool_Change_End;
     }
 }
 

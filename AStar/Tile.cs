@@ -69,6 +69,11 @@ namespace AStar
 
             return parent.G + value; // 부모 타일의 G 값에 현재 타일까지의 이동 비용을 더해 반환
         }
+
+        public void DeleteParent()
+        {
+            this.Parent = null;
+        }
         #endregion
     }
 }
