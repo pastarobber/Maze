@@ -53,6 +53,8 @@ namespace AStar
         private Brush _textBrush;
         private Pen _pen;
         private Font _font;
+        private Font _menufont;
+
 
         #region Constructor
         // MainForm의 생성자. 폼을 초기화
@@ -86,6 +88,7 @@ namespace AStar
             _textBrush = new SolidBrush(Color.Yellow);
             _pen = new Pen(Color.DarkGray);
             _font = new Font("맑은 고딕", 10);
+            _menufont = new Font("맑은 고딕", 13);
 
             _rectShape = false;
             _heartShape = false;
@@ -279,21 +282,22 @@ namespace AStar
                     else if (height < width) width = height;
                     // 배경을 검은색으로 채우고 메시지를 출력
                     e.Graphics.FillRectangle(_backgroundBrush, new Rectangle(0, 0, width, height));
-                    e.Graphics.DrawString(waitMsg, _font, _textBrush, 0, 0);
+                    e.Graphics.DrawString(waitMsg, _menufont, _textBrush, 0, 0);
                     break;
                 // 맵이 생성된 후의 상태 처리
                 case UpdateType.Create:
-                    // 모든 타일을 순회하며 각 타일을 회색으로 그린 후 테두리를 그림
+                    //모든 타일을 순회하며 각 타일을 회색으로 그린 후 테두리를 그림
                     foreach (var loc in _tiles)
                     {
-                        e.Graphics.FillRectangle(_normalBrush, loc.Region); // 타일 영역을 회색으로 채움
+                        if (loc.Text == "START" || loc.Text == "END") e.Graphics.FillRectangle(new SolidBrush(Color.Green), loc.Region);
+                        else e.Graphics.FillRectangle(_normalBrush, loc.Region); // 타일 영역을 회색으로 채움
+
                         e.Graphics.DrawRectangle(_pen, loc.Region); // 타일 테두리를 그림
-                        if (!string.IsNullOrWhiteSpace(loc.Text) & (loc.Text == "START" || loc.Text == "END")) // START, END 타일 text
-                        {
-                            e.Graphics.FillRectangle(new SolidBrush(Color.Green), loc.Region);
-                            e.Graphics.DrawString(loc.Text, _font, _textBrush, loc.Region.X, loc.Region.Y);
-                        }
                     }
+
+                    e.Graphics.DrawString(_startTile.Text, _font, _textBrush, _startTile.Region.X, _startTile.Region.Y);
+                    e.Graphics.DrawString(_endTile.Text, _font, _textBrush, _endTile.Region.X, _endTile.Region.Y);
+
                     // 맵이 생성되었음을 표시
                     _isCreated = true;
                     break;
@@ -303,16 +307,10 @@ namespace AStar
                     foreach (var loc in _tiles)
                     {
                         if (loc.IsBlock) e.Graphics.FillRectangle(_blockBrush, loc.Region); // 장애물은 어두운 회색
+                        else if (loc.Text == "START" || loc.Text == "END") e.Graphics.FillRectangle(new SolidBrush(Color.Green), loc.Region);
                         else e.Graphics.FillRectangle(_normalBrush, loc.Region); // 일반 타일은 회색
                         e.Graphics.DrawRectangle(_pen, loc.Region); // 타일 테두리 그리기
-
-                        //if (loc.Text == "START" || loc.Text == "END")//START, END 타일 text
-                        //{
-                        //    //e.Graphics.FillRectangle(new SolidBrush(Color.Green), loc.Region);
-                        //    e.Graphics.DrawString(loc.Text, _font, _textBrush, loc.Region.X, loc.Region.Y);
-                        //}
                     }
-
                     e.Graphics.DrawString(_startTile.Text, _font, _textBrush, _startTile.Region.X, _startTile.Region.Y);
                     e.Graphics.DrawString(_endTile.Text, _font, _textBrush, _endTile.Region.X, _endTile.Region.Y);
 
@@ -320,12 +318,12 @@ namespace AStar
                 // 경로를 따라 이동 중일 때의 상태 처리
                 case UpdateType.Move:
                     // 각 타일을 순회하며 장애물과 일반 타일을 그린 후 텍스트가 있으면 출력
-                    foreach (var loc in _tiles)
-                    {
+                    foreach(var loc in _tiles)
+             {
                         if (loc.IsBlock) e.Graphics.FillRectangle(_blockBrush, loc.Region); // 장애물 타일은 어두운 회색
                         else e.Graphics.FillRectangle(_normalBrush, loc.Region); // 일반 타일은 회색
                         e.Graphics.DrawRectangle(_pen, loc.Region); // 타일 테두리 그리기
-                        // 타일에 텍스트가 있으면 출력
+                                                                    // 타일에 텍스트가 있으면 출력
                         if (!string.IsNullOrWhiteSpace(loc.Text))
                         {
                             e.Graphics.DrawString(loc.Text, _font, _textBrush, loc.Region.X, loc.Region.Y);
@@ -336,12 +334,13 @@ namespace AStar
                     {
                         e.Graphics.FillRectangle(_pathBrush, loc.Region); // 경로 타일은 빨간색으로 채움
                         e.Graphics.DrawRectangle(_pen, loc.Region); // 타일 테두리 그리기
-                        // 경로 타일에 텍스트가 있으면 출력
+                                                                    // 경로 타일에 텍스트가 있으면 출력
                         if (!string.IsNullOrWhiteSpace(loc.Text))
                         {
                             e.Graphics.DrawString(loc.Text, _font, _textBrush, loc.Region.X, loc.Region.Y);
                         }
                     }
+
                     // 경로 이동이 완료되었음을 표시
                     _isStarted = false;
                     break;
