@@ -17,7 +17,8 @@ namespace AStar
     {
         // 길찾기 관련 상태 업데이트 타입을 정의한 열거형
         public enum UpdateType { None, Init, Create, Build, Move };
-        public enum ToolType { None, RectShape, HeartShape, Eraser, SetStart, SetEnd };
+        //사각형, 하트모양, 지우개, 출발 설정, 도착 설정 선택했는지
+        public enum ToolType { None, RectShape, HeartShape, Eraser, SetStart, SetEnd }; 
 
         private bool _isCreated; // 맵 생성 여부 
         private bool _isStarted; // 길찾기 시작 여부
@@ -27,19 +28,16 @@ namespace AStar
         private int _width, _height;
 
         // 각종 데이터를 저장하는 리스트들
-        //KdTree같은거 쓰면 성능 향상 있을거 같긴 함 - ㅇㅅㅂ
         private List<Tile> _tiles; // 맵의 타일들을 저장
         private List<Tile> _path; // 길찾기 경로를 저장
         private List<Tile> _openList; // A* 알고리즘의 open list
         private List<Tile> _closeList; // A* 알고리즘의 close list
         private UpdateType _updateType; // 현재 맵의 업데이트 상황
         /*---------------------------------------------------------------------------------------*/
-        private Tile _startTile, _endTile;
         private HashSet<Point> _toggledTiles;
-        private bool _isDrag;//드래그 여부
+        private Tile _startTile, _endTile;
         private ToolType _toolType;
-        //private bool _heartShape, _rectShape, _isEraser, _isSetStartTile, _isSetEndTile;//사각형, 하트모양, 지우개 선택했는지
-        //-> ToolType Enum으로 수정
+        private bool _isDrag;//드래그 여부
 
         /*
          * 1.열린 목록은 아직 탐색하지 않았거나, 탐색 도중 다시 고려해야 할 노드들을 저장하는 목록
@@ -192,6 +190,7 @@ namespace AStar
             _closeList.Clear();
             _path.Clear();
 
+            // 탐색할 방향을 설정, 현재 타일의 인접한 타일만 검사 - 방향 기반 탐색
             var directions = new List<Point> { new Point(-1, -1), new Point(0, -1), new Point(1, -1),
                                                new Point(-1,0), new Point(1,0),
                                                new Point(-1,1),new Point(0,1),new Point(1,1),};
@@ -238,29 +237,30 @@ namespace AStar
                         }
                     }
                 }
-
-                //foreach (var target in _tiles)
-                //{
-                //    if (target.IsBlock) continue; // 장애물이 있는 타일은 패스
-                //    if (_closeList.Contains(target)) continue; // 이미 close 리스트에 있는 타일은 패스
-                //    if (!IsNearLoc(tile, target)) continue; // 인접하지 않은 타일은 패스
-
-                //    if (!_openList.Contains(target)) // target이 없으면
-                //    {
-                //        _openList.Add(target); // 새로운 타일을 open 리스트에 추가
-                //        target.Execute(tile, endTile); // 각 타일의 F, G, H 값을 계산하고 경로 정보를 업데이트하는 데 사용
-                //    }
-                //    else // 이미 오픈리스트에 있으면
-                //    {   // G 값이 더 작은 경우 타일을 업데이트
-                //        if (Tile.CalcGValue(tile, target) < target.G) // G 값을 계산하는 정적 메서드
-                //        { // 타일을 업데이트할 때 G 값을 비교하는 이유는 더 최적화된 경로를 찾기 위해
-                //            target.Execute(tile, endTile);
-                //        }
-                //    }
-                //}
             }
             while (tile != null);
+            /* 수정 전 탐색 버전 - 전체 모든 타일을 순회
+            foreach (var target in _tiles)
+            {
+                if (target.IsBlock) continue; // 장애물이 있는 타일은 패스
+                if (_closeList.Contains(target)) continue; // 이미 close 리스트에 있는 타일은 패스
+                if (!IsNearLoc(tile, target)) continue; // 인접하지 않은 타일은 패스
 
+                if (!_openList.Contains(target)) // target이 없으면
+                {
+                    _openList.Add(target); // 새로운 타일을 open 리스트에 추가
+                    target.Execute(tile, endTile); // 각 타일의 F, G, H 값을 계산하고 경로 정보를 업데이트하는 데 사용
+                }
+                else // 이미 오픈리스트에 있으면
+                {   // G 값이 더 작은 경우 타일을 업데이트
+                    if (Tile.CalcGValue(tile, target) < target.G) // G 값을 계산하는 정적 메서드
+                    { // 타일을 업데이트할 때 G 값을 비교하는 이유는 더 최적화된 경로를 찾기 위해
+                        target.Execute(tile, endTile);
+                    }
+                }
+            }*/
+
+            // 경로를 찾을 수 없는 경우 처리
             if (tile != endTile)
             {
                 MessageBox.Show("길막힘"); // 경로를 찾을 수 없는 경우 메시지 출력
@@ -299,7 +299,7 @@ namespace AStar
                 // 초기화 상태일 때 맵에 초기 안내 메시지를 출력
                 case UpdateType.Init:
                     // 안내 메시지를 정의
-                    string waitMsg = "1.맵 크기 설정 (범위: 2<홀수<100)\r\n2.Create 클릭\r\n3.맵에 마우스 좌클릭하여 장애물(벽) 생성\r\n4.Start 클릭" +
+                    string waitMsg = "1.맵 크기 설정 (범위: 4<홀수<100)\r\n2.Create 클릭\r\n3.맵에 마우스 좌클릭하여 장애물(벽) 생성\r\n4.Start 클릭" +
                         "\r\n5.메뉴바에서 출발&도착을 임의로 설정 가능\r\n6.메뉴바에서 네모/하트 도장 찍기 가능\r\n7.메뉴바에 지우개 기능이 있음(5*5)" +
                         "\r\n8.Random 버튼 클릭시 미로가 랜덤으로 생성됨";
                     // 맵의 크기를 계산
@@ -524,38 +524,26 @@ namespace AStar
 
         private void Tool_full_square_Click(object sender, EventArgs e)
         {
-            //_rectShape = !_rectShape;
-            //ToggleBtnHandler(rectShape: _rectShape);
             ToggleToolBtnHandler(ToolType.RectShape);
         }
 
         private void Tool_full_heart_Click(object sender, EventArgs e)
         {
-            //_heartShape = !_heartShape;
-            //ToggleBtnHandler(heartShape: _heartShape);
             ToggleToolBtnHandler(ToolType.HeartShape);
         }
         
         private void Tool_Eraser_Click(object sender, EventArgs e)
         {
-            //_isEraser = !_isEraser;
-            //ToggleBtnHandler(erase: _isEraser);
             ToggleToolBtnHandler(ToolType.Eraser);
         }
 
         private void Tool_Change_Start_Click(object sender, EventArgs e)
         {
-            //_isSetStartTile = !_isSetStartTile;
-            //ToggleBtnHandler(changeStart: _isSetStartTile);
-
             ToggleToolBtnHandler(ToolType.SetStart);
         }
 
         private void Tool_Change_End_Click(object sender, EventArgs e)
         {
-            //_isSetEndTile = !_isSetEndTile;
-            //ToggleBtnHandler(changeEnd: _isSetEndTile);
-
             ToggleToolBtnHandler(ToolType.SetEnd);
         }
 
@@ -563,17 +551,6 @@ namespace AStar
         {
             _toolType = (_toolType == toolType ? ToolType.None : toolType);
         }
-        //기존코드에서 위의 코드로 수정
-        //private void ToggleBtnHandler(bool rectShape = false, bool heartShape = false,
-        //    bool erase = false, bool changeStart = false, bool changeEnd = false)
-        //{
-        //    // 공통 동작: 다른 기능들을 비활성화
-        //    _isEraser = erase;
-        //    _rectShape = rectShape;
-        //    _heartShape = heartShape;
-        //    _isSetStartTile = changeStart;
-        //    _isSetEndTile = changeEnd;
-        //}
 
         private void SetStartTile(Point pos)
         {
@@ -615,7 +592,6 @@ namespace AStar
             _toolType = ToolType.None;
         }
         #endregion
-
 
         #region Private Method
         // 맵을 갱신하는 메서드

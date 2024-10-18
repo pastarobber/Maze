@@ -7,9 +7,9 @@ namespace AStar
     public class MazeGenerator
     {
         private List<Tile> _tiles; // 타일 목록
+        private Random _random; // 랜덤 객체
         private int _width; // 미로 너비
         private int _height; // 미로 높이
-        private Random _random; // 랜덤 객체
 
         // 생성자: 타일 목록과 미로의 크기를 받아옴
         public MazeGenerator(List<Tile> tiles, int height, int width)
