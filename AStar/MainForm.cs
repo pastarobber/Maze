@@ -176,8 +176,8 @@ namespace AStar
                     _tiles.Add(loc); // 타일 리스트에 추가
                 }
             }
-            SetStartTile(new Point(0,0)); // 시작 타일 설정
-            SetEndTile(new Point(_mapSizeX-1, _mapSizeY-1));
+            SetStartTile(new Point(0, 0)); // 시작 타일 설정
+            SetEndTile(new Point(_mapSizeX - 1, _mapSizeY - 1));
         }
 
         // "시작" 버튼을 클릭했을 때 호출
@@ -194,6 +194,10 @@ namespace AStar
             _openList.Clear();
             _closeList.Clear();
             _path.Clear();
+
+            var directions = new List<Point> { new Point(-1, -1), new Point(0, -1), new Point(1, -1),
+                                               new Point(-1,0), new Point(1,0),
+                                               new Point(-1,1),new Point(0,1),new Point(1,1),};
 
             Tile startTile = _startTile, endTile = _endTile;
 
@@ -212,8 +216,12 @@ namespace AStar
                 if (tile == endTile) break; // 목적지에 도착하면 종료
 
                 // 타일 주변의 타일을 검사
-                foreach (var target in _tiles)
+                foreach (var dir in directions)
                 {
+                    int nx = tile.X + dir.X;
+                    int ny = tile.Y + dir.Y;
+                    Tile target = FindTile(new Point(nx, ny));
+
                     if (target.IsBlock) continue; // 장애물이 있는 타일은 패스
                     if (_closeList.Contains(target)) continue; // 이미 close 리스트에 있는 타일은 패스
                     if (!IsNearLoc(tile, target)) continue; // 인접하지 않은 타일은 패스
@@ -231,6 +239,26 @@ namespace AStar
                         }
                     }
                 }
+
+                //foreach (var target in _tiles)
+                //{
+                //    if (target.IsBlock) continue; // 장애물이 있는 타일은 패스
+                //    if (_closeList.Contains(target)) continue; // 이미 close 리스트에 있는 타일은 패스
+                //    if (!IsNearLoc(tile, target)) continue; // 인접하지 않은 타일은 패스
+
+                //    if (!_openList.Contains(target)) // target이 없으면
+                //    {
+                //        _openList.Add(target); // 새로운 타일을 open 리스트에 추가
+                //        target.Execute(tile, endTile); // 각 타일의 F, G, H 값을 계산하고 경로 정보를 업데이트하는 데 사용
+                //    }
+                //    else // 이미 오픈리스트에 있으면
+                //    {   // G 값이 더 작은 경우 타일을 업데이트
+                //        if (Tile.CalcGValue(tile, target) < target.G) // G 값을 계산하는 정적 메서드
+                //        { // 타일을 업데이트할 때 G 값을 비교하는 이유는 더 최적화된 경로를 찾기 위해
+                //            target.Execute(tile, endTile);
+                //        }
+                //    }
+                //}
             }
             while (tile != null);
 
@@ -560,7 +588,8 @@ namespace AStar
             _startTile.DeleteParent();
             isSetStartTile = false;
         }
-        private void SetEndTile(Point pos) {
+        private void SetEndTile(Point pos)
+        {
             var tile = FindTile(pos);
 
             if (tile.IsBlock || tile.Text == "START")
@@ -603,7 +632,7 @@ namespace AStar
         private Point ConverRelativePos(Point mousePos)
         {
             int x = (int)(mousePos.X / _width), y = (int)(mousePos.Y / _height);
-            return new Point(x,y); // 계산된 타일 인덱스를 Point 객체로 반환
+            return new Point(x, y); // 계산된 타일 인덱스를 Point 객체로 반환
         }
 
         // 주어진 좌표(Point pos)를 기반으로 해당 위치에 있는 타일(Tile)을 반환
