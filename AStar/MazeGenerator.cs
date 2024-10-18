@@ -40,8 +40,9 @@ namespace AStar
         private void CarveMaze(int x, int y)
         {
             // 이동할 방향: 오른쪽, 아래, 왼쪽, 위
+            //물론 랜덤하게 섞음.
             var directions = new Point[]
-            { // 두 칸을 떨어뜨리는 이유는 그 사이에 통로를 만들기 위한 것
+            {
                 new Point(2, 0), // 오른
                 new Point(0, 2), // 아래
                 new Point(-2, 0), // 왼

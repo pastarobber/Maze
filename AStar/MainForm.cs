@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static AStar.MainForm;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace AStar
@@ -16,6 +17,7 @@ namespace AStar
     {
         // 길찾기 관련 상태 업데이트 타입을 정의한 열거형
         public enum UpdateType { None, Init, Create, Build, Move };
+        public enum ToolType { None, RectShape, HeartShape, Eraser, SetStart, SetEnd };
 
         private bool _isCreated; // 맵 생성 여부 
         private bool _isStarted; // 길찾기 시작 여부
@@ -30,14 +32,15 @@ namespace AStar
         private List<Tile> _path; // 길찾기 경로를 저장
         private List<Tile> _openList; // A* 알고리즘의 open list
         private List<Tile> _closeList; // A* 알고리즘의 close list
-        private UpdateType _updateType; // 현재 맵의 업데이트 상태
+        private UpdateType _updateType; // 현재 맵의 업데이트 상황
         /*---------------------------------------------------------------------------------------*/
+        private Tile _startTile, _endTile;
         private HashSet<Point> _toggledTiles;
         private bool _isDrag;//드래그 여부
-        private bool _heartShape, _rectShape, _isEraser;//사각형, 하트모양, 지우개 선택했는지
+        private ToolType _toolType;
+        //private bool _heartShape, _rectShape, _isEraser, _isSetStartTile, _isSetEndTile;//사각형, 하트모양, 지우개 선택했는지
+        //-> ToolType Enum으로 수정
 
-        private Tile _startTile, _endTile;
-        private bool isSetStartTile, isSetEndTile;
         /*
          * 1.열린 목록은 아직 탐색하지 않았거나, 탐색 도중 다시 고려해야 할 노드들을 저장하는 목록
          * 즉, 앞으로 탐색할 후보 노드들을 관리하는 공간
@@ -90,14 +93,12 @@ namespace AStar
             _font = new Font("맑은 고딕", 10);
             _menufont = new Font("맑은 고딕", 13);
 
-            _rectShape = false;
-            _heartShape = false;
-
-            isSetStartTile = false;
-            isSetEndTile = false;
-
+            numericUpDown_x.Minimum = 5;
             numericUpDown_x.Maximum = 99;
+            numericUpDown_y.Minimum = 5;
             numericUpDown_y.Maximum = 99;
+
+            _toolType = ToolType.None;
 
             // 맵을 초기화
             UpdateMap(UpdateType.Init);
@@ -115,8 +116,6 @@ namespace AStar
             }
             else
             {   // 만약 값이 2 이하라면, 값이 3으로 고정됨
-                if (numericUpDown_x.Value <= 2) numericUpDown_x.Value = 3;
-
                 _mapSizeX = (int)numericUpDown_x.Value; // 맵 크기 값을 NumericUpDown의 현재 값으로 설정
                 // 맵 크기를 무조건 홀수로 만들기 위해 처리
                 _mapSizeX = 2 * (_mapSizeX / 2) + 1; // (_mapSizeX / 2) * 2 는 짝수, +1 을 하면 홀수가 됨
@@ -134,8 +133,6 @@ namespace AStar
             }
             else
             {
-                if (numericUpDown_x.Value <= 2) numericUpDown_y.Value = 3;
-
                 _mapSizeY = (int)numericUpDown_y.Value; // 변경된 값 적용
                 _mapSizeY = 2 * (_mapSizeY / 2) + 1; //무조건 홀수값만.
                 numericUpDown_y.Value = _mapSizeY;
@@ -220,6 +217,8 @@ namespace AStar
                 {
                     int nx = tile.X + dir.X;
                     int ny = tile.Y + dir.Y;
+                    if (!IsInBound(new Point(nx, ny))) continue;
+
                     Tile target = FindTile(new Point(nx, ny));
 
                     if (target.IsBlock) continue; // 장애물이 있는 타일은 패스
@@ -425,28 +424,21 @@ namespace AStar
 
             string actionType = "";
 
-            if (_rectShape && isOnceClicked) actionType = "CreateRect";
-            else if (_heartShape && isOnceClicked) actionType = "CreateHeart";
-            else if (isSetStartTile && isOnceClicked) actionType = "SetStartTile";
-            else if (isSetEndTile && isOnceClicked) actionType = "SetEndTile";
+            if (_toolType==ToolType.RectShape && isOnceClicked) actionType = "CreateRectObstacle";
+            else if (_toolType==ToolType.HeartShape && isOnceClicked) actionType = "CreateHeartObstacle";
+            else if (_toolType==ToolType.SetStart && isOnceClicked) actionType = "SetStartTile";
+            else if (_toolType==ToolType.SetEnd && isOnceClicked) actionType = "SetEndTile";
             else if (isOnceClicked) actionType = "SingleClick";
             else if (_isDrag) actionType = "Drag";
 
             switch (actionType)
             {
-                case "CreateRect":
+                case "CreateRectObstacle":
                     CreateRectObstacle(pos);
                     UpdateMap(UpdateType.Build);
                     break;
-
-                case "CreateHeart":
+                case "CreateHeartObstacle":
                     CreateHeartObstacle(pos);
-                    UpdateMap(UpdateType.Build);
-                    break;
-
-                case "SingleClick":
-                    _isDrag = true;
-                    UpdateSingleTIle(pos);
                     UpdateMap(UpdateType.Build);
                     break;
                 case "SetStartTile":
@@ -457,11 +449,15 @@ namespace AStar
                     SetEndTile(pos);
                     UpdateMap(UpdateType.Build);
                     break;
+                case "SingleClick":
+                    _isDrag = true;
+                    UpdateSingleTIle(pos);
+                    UpdateMap(UpdateType.Build);
+                    break;
                 case "Drag":
                     UpdateSingleTIle(pos);
                     UpdateMap(UpdateType.Build);
                     break;
-
                 default:
                     break;
             }
@@ -470,23 +466,19 @@ namespace AStar
         // 마우스 좌표를 기반으로 장애물 타일을 그리는 메서드
         private void UpdateSingleTIle(Point pos)
         {
-            // 모든 타일을 순회하여 마우스 좌표가 해당 타일 영역 안에 있는지 확인
-            // 이미 토글된 타일이 아닌 경우
-            if (!_toggledTiles.Contains(pos))
+            if (_toggledTiles.Contains(pos)) return;
+
+            if (_toolType == ToolType.Eraser) EraseBlockedTile(pos);
+            else
             {
                 Tile tile = FindTile(pos);
-                if (_isEraser)
-                    EraseBlockedTile(pos);
-                else
-                {
-                    if (tile.Text == "START" || tile.Text == "END") return;
-                    tile.IsBlock = !tile.IsBlock;
-                }
-                _toggledTiles.Add(pos); // 토글된 타일 기록
+                if (tile.Text == "START" || tile.Text == "END") return;
+                tile.IsBlock = !tile.IsBlock;
             }
+            _toggledTiles.Add(pos); // 토글된 타일 기록
         }
 
-        private void UpdatePolyTile(Point pos, Point[] offsets, bool blockState)
+        private void UpdateTileBlockState(Point pos, Point[] offsets, bool blockState)
         {
             foreach (var off in offsets) // 각 오프셋에 대해
             {
@@ -507,7 +499,7 @@ namespace AStar
                                 new Point(-1,0),  new Point(0,0),  new Point(1,0),  // 중앙 3개
                                 new Point(-1,1),  new Point(0,1),  new Point(1,1) }; // 아래쪽 3개
 
-            UpdatePolyTile(pos, offsets, blockState: true);
+            UpdateTileBlockState(pos, offsets, blockState: true);
         }
 
         // 사용자가 선택한 위치(pos)를 중심으로 하트모양 장애물을 생성
@@ -518,7 +510,7 @@ namespace AStar
                                 new Point(-2,0), new Point(-1,0),  new Point(0,0),  new Point(1,0), new Point(2,0),  // 5개
                                 new Point(-1,1),  new Point(0,1),  new Point(1,1), // 3개
                                 new Point(0,2)}; // 1개
-            UpdatePolyTile(pos, offsets, blockState: true);
+            UpdateTileBlockState(pos, offsets, blockState: true);
         }
         private void EraseBlockedTile(Point pos) // 지우개 
         {
@@ -527,46 +519,61 @@ namespace AStar
                                 new Point(-2,0), new Point(-1,0), new Point(0,0), new Point(1,0), new Point(2,0),  // 5개
                                 new Point(-2,1),  new Point(-1,1), new Point(0,1), new Point(1,1), new Point(2,1),  // 5개
                                 new Point(-2,2),  new Point(-1,2), new Point(0,2), new Point(1,2), new Point(2,2) }; // 5개
-            UpdatePolyTile(pos, offsets, blockState: false);
+            UpdateTileBlockState(pos, offsets, blockState: false);
         }
 
         private void Tool_full_square_Click(object sender, EventArgs e)
         {
-            _rectShape = !_rectShape;
-            ToggleBtnHandler(rectShape: _rectShape);
+            //_rectShape = !_rectShape;
+            //ToggleBtnHandler(rectShape: _rectShape);
+            ToggleToolBtnHandler(ToolType.RectShape);
         }
 
         private void Tool_full_heart_Click(object sender, EventArgs e)
         {
-            _heartShape = !_heartShape;
-            ToggleBtnHandler(heartShape: _heartShape);
+            //_heartShape = !_heartShape;
+            //ToggleBtnHandler(heartShape: _heartShape);
+            ToggleToolBtnHandler(ToolType.HeartShape);
         }
-
+        
         private void Tool_Eraser_Click(object sender, EventArgs e)
         {
-            _isEraser = !_isEraser;
-            ToggleBtnHandler(erase: _isEraser);
-        }
-
-        private void ToggleBtnHandler(bool rectShape = false, bool heartShape = false, bool erase = false)
-        {
-            // 공통 동작: 다른 기능들을 비활성화
-            _isEraser = erase;
-            _rectShape = rectShape;
-            _heartShape = heartShape;
+            //_isEraser = !_isEraser;
+            //ToggleBtnHandler(erase: _isEraser);
+            ToggleToolBtnHandler(ToolType.Eraser);
         }
 
         private void Tool_Change_Start_Click(object sender, EventArgs e)
         {
-            //MessageBox.Show("출발지를 선택");
-            isSetStartTile = true;
+            //_isSetStartTile = !_isSetStartTile;
+            //ToggleBtnHandler(changeStart: _isSetStartTile);
+
+            ToggleToolBtnHandler(ToolType.SetStart);
         }
 
         private void Tool_Change_End_Click(object sender, EventArgs e)
         {
-            //MessageBox.Show("목적지 선택");
-            isSetEndTile = true;
+            //_isSetEndTile = !_isSetEndTile;
+            //ToggleBtnHandler(changeEnd: _isSetEndTile);
+
+            ToggleToolBtnHandler(ToolType.SetEnd);
         }
+
+        private void ToggleToolBtnHandler(ToolType toolType)
+        {
+            _toolType = (_toolType == toolType ? ToolType.None : toolType);
+        }
+        //기존코드에서 위의 코드로 수정
+        //private void ToggleBtnHandler(bool rectShape = false, bool heartShape = false,
+        //    bool erase = false, bool changeStart = false, bool changeEnd = false)
+        //{
+        //    // 공통 동작: 다른 기능들을 비활성화
+        //    _isEraser = erase;
+        //    _rectShape = rectShape;
+        //    _heartShape = heartShape;
+        //    _isSetStartTile = changeStart;
+        //    _isSetEndTile = changeEnd;
+        //}
 
         private void SetStartTile(Point pos)
         {
@@ -574,7 +581,7 @@ namespace AStar
 
             if (tile.IsBlock || tile.Text == "END")
             {
-                MessageBox.Show("출발지 설정 불가");
+                MessageBox.Show("출발지 설정 불가 다시 설정하세요.");
                 return;
             }
 
@@ -586,7 +593,7 @@ namespace AStar
             _startTile = tile;
             _startTile.Text = "START";
             _startTile.DeleteParent();
-            isSetStartTile = false;
+            _toolType = ToolType.None;
         }
         private void SetEndTile(Point pos)
         {
@@ -594,7 +601,7 @@ namespace AStar
 
             if (tile.IsBlock || tile.Text == "START")
             {
-                MessageBox.Show("목적지 설정 불가");
+                MessageBox.Show("목적지 설정 불가 다시 설정하세요.");
                 return;
             }
             if (_endTile != null)
@@ -605,7 +612,7 @@ namespace AStar
             _endTile = tile;
             _endTile.Text = "END";
             _endTile.DeleteParent();
-            isSetEndTile = false;
+            _toolType = ToolType.None;
         }
         #endregion
 
