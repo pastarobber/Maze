@@ -14,9 +14,10 @@
   ![Visual Studio](https://img.shields.io/badge/-Visual%20Studio-5C2D91?style=flat-square&logo=visual-studio&logoColor=white)
 - **팀원 소개 및 기여(역할)**
   <p>
-  <a href="https://github.com/YSB1026/pastarobber/graphs/contributors">
+  <a href="https://github.com/pastarobber/Maze/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=pastarobber/Maze" style="zoom: 100%;"/>
 </a>
+
 
 |    팀원    |                      기여                       |
 | :--------: | :---------------------------------------------: |
