@@ -74,6 +74,17 @@ namespace AStar
         {
             this.Parent = null;
         }
+
+        public int CompareTo(Tile other)
+        {
+            if (this.F != other.F)
+                return this.F.CompareTo(other.F);
+
+            if (this.X != other.X)
+                return this.X.CompareTo(other.X);
+
+            return this.Y.CompareTo(other.Y);
+        }
         #endregion
     }
 }

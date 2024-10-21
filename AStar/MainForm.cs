@@ -16,12 +16,12 @@ namespace AStar
     public partial class MainForm : Form
     {
         // 길찾기 관련 상태 업데이트 타입을 정의한 열거형
-        public enum UpdateType { None, Init, Create, Build, Move };
-        //사각형, 하트모양, 지우개, 출발 설정, 도착 설정 선택했는지
-        public enum ToolType { None, RectShape, HeartShape, Eraser, SetStart, SetEnd }; 
+        public enum UpdateType { None, Init, Create, Build, Move, Moving };
+        public enum ToolType { None, RectShape, HeartShape, Eraser, SetStart, SetEnd }; //사각형, 하트모양, 지우개 선택했는지
 
         private bool _isCreated; // 맵 생성 여부 
         private bool _isStarted; // 길찾기 시작 여부
+        private bool _isDrag;//드래그 여부
 
         private int _mapSizeX; // 맵의 X축 크기
         private int _mapSizeY; // 맵의 Y축 크기
@@ -30,14 +30,13 @@ namespace AStar
         // 각종 데이터를 저장하는 리스트들
         private List<Tile> _tiles; // 맵의 타일들을 저장
         private List<Tile> _path; // 길찾기 경로를 저장
-        private List<Tile> _openList; // A* 알고리즘의 open list
+        //private List<Tile> _openList; 
+        private PriorityQueue _openList; // A* 알고리즘의 open list
         private List<Tile> _closeList; // A* 알고리즘의 close list
         private UpdateType _updateType; // 현재 맵의 업데이트 상황
-        /*---------------------------------------------------------------------------------------*/
-        private HashSet<Point> _toggledTiles;
         private Tile _startTile, _endTile;
+        private HashSet<Point> _toggledTiles;
         private ToolType _toolType;
-        private bool _isDrag;//드래그 여부
 
         /*
          * 1.열린 목록은 아직 탐색하지 않았거나, 탐색 도중 다시 고려해야 할 노드들을 저장하는 목록
@@ -55,7 +54,6 @@ namespace AStar
         private Pen _pen;
         private Font _font;
         private Font _menufont;
-
 
         #region Constructor
         // MainForm의 생성자. 폼을 초기화
@@ -77,7 +75,8 @@ namespace AStar
             // 리스트와 브러시, 폰트 등 초기화
             _tiles = new List<Tile>();
             _path = new List<Tile>();
-            _openList = new List<Tile>();
+            _openList = new PriorityQueue();
+            //_openList = new List<Tile>();
             _closeList = new List<Tile>();
             _isDrag = false;
             _toggledTiles = new HashSet<Point>();
@@ -92,9 +91,9 @@ namespace AStar
             _menufont = new Font("맑은 고딕", 13);
 
             numericUpDown_x.Minimum = 5;
-            numericUpDown_x.Maximum = 99;
+            numericUpDown_x.Maximum = 100;
             numericUpDown_y.Minimum = 5;
-            numericUpDown_y.Maximum = 99;
+            numericUpDown_y.Maximum = 100;
 
             _toolType = ToolType.None;
 
@@ -114,10 +113,13 @@ namespace AStar
             }
             else
             {   // 만약 값이 2 이하라면, 값이 3으로 고정됨
-                _mapSizeX = (int)numericUpDown_x.Value; // 맵 크기 값을 NumericUpDown의 현재 값으로 설정
+                int newSizeX = (int)numericUpDown_x.Value; // 맵 크기 값을 NumericUpDown의 현재 값으로 설정
                 // 맵 크기를 무조건 홀수로 만들기 위해 처리
-                _mapSizeX = 2 * (_mapSizeX / 2) + 1; // (_mapSizeX / 2) * 2 는 짝수, +1 을 하면 홀수가 됨
-                // 수정된 값을 NumericUpDown 컨트롤에 다시 반영
+                if (newSizeX > _mapSizeX)
+                    _mapSizeX = (newSizeX % 2 == 0 ? 2 * newSizeX / 2 + 1 : newSizeX);
+                else
+                    _mapSizeX = (newSizeX % 2 == 0 ? 2 * newSizeX / 2 - 1 : newSizeX);
+
                 numericUpDown_x.Value = _mapSizeX;
             }
         }
@@ -131,8 +133,13 @@ namespace AStar
             }
             else
             {
-                _mapSizeY = (int)numericUpDown_y.Value; // 변경된 값 적용
-                _mapSizeY = 2 * (_mapSizeY / 2) + 1; //무조건 홀수값만.
+                int newSizeY = (int)numericUpDown_y.Value; // 변경된 값 적용
+
+                if (newSizeY > _mapSizeY)
+                    _mapSizeY = (newSizeY % 2 == 0 ? 2 * newSizeY / 2 + 1 : newSizeY);
+                else
+                    _mapSizeY = (newSizeY % 2 == 0 ? 2 * newSizeY / 2 - 1 : newSizeY);
+
                 numericUpDown_y.Value = _mapSizeY;
             }
         }
@@ -176,6 +183,7 @@ namespace AStar
         }
 
         // "시작" 버튼을 클릭했을 때 호출
+
         private void Button_start_Click(object sender, EventArgs e)
         {
             if (!_isCreated) return; // 맵이 생성되지 않았다면 길찾기 시작 불가
@@ -183,33 +191,33 @@ namespace AStar
             // 기존 길찾기 정보 초기화
             _tiles.ForEach(o =>
             {
-                if (o.Text == "START" || o.Text == "END") return; // "START" 또는 "END"인 타일은 건너뜀
-                o.Text = null; // 그 외 타일의 Text 속성을 null로 설정
+                if (o.Text == "START" || o.Text == "END") return;
+                o.Text = null;
             });
             _openList.Clear();
             _closeList.Clear();
             _path.Clear();
 
-            // 탐색할 방향을 설정, 현재 타일의 인접한 타일만 검사 - 방향 기반 탐색
             var directions = new List<Point> { new Point(-1, -1), new Point(0, -1), new Point(1, -1),
                                                new Point(-1,0), new Point(1,0),
-                                               new Point(-1,1),new Point(0,1),new Point(1,1),};
+                                               new Point(-1,1),new Point(0,1),new Point(1,1)};
 
             Tile startTile = _startTile, endTile = _endTile;
-
-            _openList.Add(startTile); // 시작 타일을 open 리스트에 추가
             Tile tile = null;
+
+            _openList.Enqueue(startTile);
+            //_openList.Add(startTile);
             do
             {
-                if (_openList.Count == 0) break; // open 리스트가 비어 있으면 종료
+                if (_openList.Count == 0) break;
 
-                // OrderBy는 C#에서 LINQ (Language Integrated Query)의 메서드 중 하나로, 컬렉션을 정렬하는 데 사용됩니다.
-                // OrderBy는 지정된 조건에 따라 오름차순으로 요소들을 정렬합니다.
-                tile = _openList.OrderBy(o => o.F).First(); // F 값이 가장 낮은 타일 선택
-                _openList.Remove(tile); // open 리스트에서 제거
-                _closeList.Add(tile); // close 리스트에 추가
+                tile = _openList.Dequeue();//PQ는 Min Heap으로 구현, Dequeue()을 수행하면 Min F를 delete 및 return.
+                //tile = _openList.OrderBy(o => o.F).First();//기존코드
+                //_openList.Remove(tile);//기존코드
+                _closeList.Add(tile);
+                //tile.Text = "C_" + _closeList.Count;//디버깅
 
-                if (tile == endTile) break; // 목적지에 도착하면 종료
+                if (tile == endTile) break;
 
                 // 타일 주변의 타일을 검사
                 foreach (var dir in directions)
@@ -220,59 +228,62 @@ namespace AStar
 
                     Tile target = FindTile(new Point(nx, ny));
 
-                    if (target.IsBlock) continue; // 장애물이 있는 타일은 패스
-                    if (_closeList.Contains(target)) continue; // 이미 close 리스트에 있는 타일은 패스
-                    if (!IsNearLoc(tile, target)) continue; // 인접하지 않은 타일은 패스
+                    if (target.IsBlock == true) continue;
+                    if (_closeList.Contains(target)) continue;
 
-                    if (!_openList.Contains(target)) // target이 없으면
+                    if (!_openList.Contains(target))
                     {
-                        _openList.Add(target); // 새로운 타일을 open 리스트에 추가
-                        target.Execute(tile, endTile); // 각 타일의 F, G, H 값을 계산하고 경로 정보를 업데이트하는 데 사용
+                        //_openList.Add(target)
+                        target.Execute(tile, endTile);
+                        //기존 코드랑 다르게 F값을 계산하고 가야함.
+                        //Priority Queue를 min heap으로 구현했고,
+                        //pq에 넣으면서 다시 heapify를 하는데, 이때 계산안하고 넣으면 F, G, H 다 쓰레기값 들어가있어서
+                        //pq가 제대로 동작을안함.
+                        //이거 때문에 2시간 씀
+                        _openList.Enqueue(target);
                     }
-                    else // 이미 오픈리스트에 있으면
-                    {   // G 값이 더 작은 경우 타일을 업데이트
-                        if (Tile.CalcGValue(tile, target) < target.G) // G 값을 계산하는 정적 메서드
-                        { // 타일을 업데이트할 때 G 값을 비교하는 이유는 더 최적화된 경로를 찾기 위해
+                    else
+                    {
+                        if (Tile.CalcGValue(tile, target) < target.G)
+                        {
                             target.Execute(tile, endTile);
                         }
+                        //target.Text = "O_" + _openList.Count; //디버깅
                     }
                 }
-            }
-            while (tile != null);
-            /* 수정 전 탐색 버전 - 전체 모든 타일을 순회
-            foreach (var target in _tiles)
-            {
-                if (target.IsBlock) continue; // 장애물이 있는 타일은 패스
-                if (_closeList.Contains(target)) continue; // 이미 close 리스트에 있는 타일은 패스
-                if (!IsNearLoc(tile, target)) continue; // 인접하지 않은 타일은 패스
+            } while (tile != null);
 
-                if (!_openList.Contains(target)) // target이 없으면
-                {
-                    _openList.Add(target); // 새로운 타일을 open 리스트에 추가
-                    target.Execute(tile, endTile); // 각 타일의 F, G, H 값을 계산하고 경로 정보를 업데이트하는 데 사용
-                }
-                else // 이미 오픈리스트에 있으면
-                {   // G 값이 더 작은 경우 타일을 업데이트
-                    if (Tile.CalcGValue(tile, target) < target.G) // G 값을 계산하는 정적 메서드
-                    { // 타일을 업데이트할 때 G 값을 비교하는 이유는 더 최적화된 경로를 찾기 위해
-                        target.Execute(tile, endTile);
-                    }
-                }
-            }*/
+            //foreach (var target in _tiles)
+            //{
+            //    if (target.IsBlock) continue; // 장애물이 있는 타일은 패스
+            //    if (_closeList.Contains(target)) continue; // 이미 close 리스트에 있는 타일은 패스
+            //    if (!IsNearLoc(tile, target)) continue; // 인접하지 않은 타일은 패스
+            //    if (!_openList.Contains(target)) // target이 없으면
+            //    {
+            //        _openList.Add(target); // 새로운 타일을 open 리스트에 추가
+            //        target.Execute(tile, endTile); // 각 타일의 F, G, H 값을 계산하고 경로 정보를 업데이트하는 데 사용
+            //    }
+            //    else // 이미 오픈리스트에 있으면
+            //    {   // G 값이 더 작은 경우 타일을 업데이트
+            //        if (Tile.CalcGValue(tile, target) < target.G) // G 값을 계산하는 정적 메서드
+            //        { // 타일을 업데이트할 때 G 값을 비교하는 이유는 더 최적화된 경로를 찾기 위해
+            //            target.Execute(tile, endTile);
+            //        }
+            //    }
+            //}
 
-            // 경로를 찾을 수 없는 경우 처리
             if (tile != endTile)
             {
                 MessageBox.Show("길막힘"); // 경로를 찾을 수 없는 경우 메시지 출력
                 return;
             }
+
             // 경로를 거꾸로 추적하여 저장
             do
             {
                 _path.Add(tile);
                 tile = tile.Parent;
-            }
-            while (tile != null);
+            } while (tile != null);
             _path.Reverse(); // 경로를 뒤집어 올바른 순서로 설정
 
             // 경로에 따라 타일에 텍스트 표시
@@ -299,7 +310,7 @@ namespace AStar
                 // 초기화 상태일 때 맵에 초기 안내 메시지를 출력
                 case UpdateType.Init:
                     // 안내 메시지를 정의
-                    string waitMsg = "1.맵 크기 설정 (범위: 4<홀수<100)\r\n2.Create 클릭\r\n3.맵에 마우스 좌클릭하여 장애물(벽) 생성\r\n4.Start 클릭" +
+                    string waitMsg = "1.맵 크기 설정 (범위: 2<홀수<100)\r\n2.Create 클릭\r\n3.맵에 마우스 좌클릭하여 장애물(벽) 생성\r\n4.Start 클릭" +
                         "\r\n5.메뉴바에서 출발&도착을 임의로 설정 가능\r\n6.메뉴바에서 네모/하트 도장 찍기 가능\r\n7.메뉴바에 지우개 기능이 있음(5*5)" +
                         "\r\n8.Random 버튼 클릭시 미로가 랜덤으로 생성됨";
                     // 맵의 크기를 계산
@@ -345,8 +356,8 @@ namespace AStar
                 // 경로를 따라 이동 중일 때의 상태 처리
                 case UpdateType.Move:
                     // 각 타일을 순회하며 장애물과 일반 타일을 그린 후 텍스트가 있으면 출력
-                    foreach(var loc in _tiles)
-             {
+                    foreach (var loc in _tiles)
+                    {
                         if (loc.IsBlock) e.Graphics.FillRectangle(_blockBrush, loc.Region); // 장애물 타일은 어두운 회색
                         else e.Graphics.FillRectangle(_normalBrush, loc.Region); // 일반 타일은 회색
                         e.Graphics.DrawRectangle(_pen, loc.Region); // 타일 테두리 그리기
@@ -367,8 +378,6 @@ namespace AStar
                             e.Graphics.DrawString(loc.Text, _font, _textBrush, loc.Region.X, loc.Region.Y);
                         }
                     }
-
-                    // 경로 이동이 완료되었음을 표시
                     _isStarted = false;
                     break;
             }
