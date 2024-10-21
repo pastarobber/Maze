@@ -52,10 +52,10 @@
             // pictureBox_map
             // 
             this.pictureBox_map.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pictureBox_map.Location = new System.Drawing.Point(185, 42);
+            this.pictureBox_map.Location = new System.Drawing.Point(185, 44);
             this.pictureBox_map.Margin = new System.Windows.Forms.Padding(5, 6, 5, 6);
             this.pictureBox_map.Name = "pictureBox_map";
-            this.pictureBox_map.Size = new System.Drawing.Size(1739, 1012);
+            this.pictureBox_map.Size = new System.Drawing.Size(1739, 1010);
             this.pictureBox_map.TabIndex = 0;
             this.pictureBox_map.TabStop = false;
             this.pictureBox_map.Paint += new System.Windows.Forms.PaintEventHandler(this.PictureBox_map_Paint);
@@ -72,10 +72,10 @@
             this.panel1.Controls.Add(this.button_createMap);
             this.panel1.Controls.Add(this.button_start);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Left;
-            this.panel1.Location = new System.Drawing.Point(0, 42);
+            this.panel1.Location = new System.Drawing.Point(0, 44);
             this.panel1.Margin = new System.Windows.Forms.Padding(5, 6, 5, 6);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(185, 1012);
+            this.panel1.Size = new System.Drawing.Size(185, 1010);
             this.panel1.TabIndex = 1;
             // 
             // button_randMap
@@ -163,42 +163,43 @@
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Padding = new System.Windows.Forms.Padding(10, 3, 0, 3);
-            this.menuStrip1.Size = new System.Drawing.Size(1924, 42);
+            this.menuStrip1.Size = new System.Drawing.Size(1924, 44);
             this.menuStrip1.TabIndex = 2;
             this.menuStrip1.Text = "menuStrip1";
+            this.menuStrip1.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.menuStrip1_ItemClicked_1);
             // 
             // tool_full_square
             // 
             this.tool_full_square.Name = "tool_full_square";
-            this.tool_full_square.Size = new System.Drawing.Size(58, 36);
+            this.tool_full_square.Size = new System.Drawing.Size(58, 38);
             this.tool_full_square.Text = "■";
             this.tool_full_square.Click += new System.EventHandler(this.Tool_full_square_Click);
             // 
             // tool_full_heart
             // 
             this.tool_full_heart.Name = "tool_full_heart";
-            this.tool_full_heart.Size = new System.Drawing.Size(58, 36);
+            this.tool_full_heart.Size = new System.Drawing.Size(58, 38);
             this.tool_full_heart.Text = "♥";
             this.tool_full_heart.Click += new System.EventHandler(this.Tool_full_heart_Click);
             // 
             // tool_Eraser
             // 
             this.tool_Eraser.Name = "tool_Eraser";
-            this.tool_Eraser.Size = new System.Drawing.Size(106, 36);
+            this.tool_Eraser.Size = new System.Drawing.Size(106, 38);
             this.tool_Eraser.Text = "지우개";
             this.tool_Eraser.Click += new System.EventHandler(this.Tool_Eraser_Click);
             // 
             // Tool_Change_Start
             // 
             this.Tool_Change_Start.Name = "Tool_Change_Start";
-            this.Tool_Change_Start.Size = new System.Drawing.Size(194, 36);
+            this.Tool_Change_Start.Size = new System.Drawing.Size(194, 38);
             this.Tool_Change_Start.Text = "출발 위치 변경";
             this.Tool_Change_Start.Click += new System.EventHandler(this.Tool_Change_Start_Click);
             // 
             // Tool_Change_End
             // 
             this.Tool_Change_End.Name = "Tool_Change_End";
-            this.Tool_Change_End.Size = new System.Drawing.Size(194, 36);
+            this.Tool_Change_End.Size = new System.Drawing.Size(194, 38);
             this.Tool_Change_End.Text = "도착 위치 변경";
             this.Tool_Change_End.Click += new System.EventHandler(this.Tool_Change_End_Click);
             // 

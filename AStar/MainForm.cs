@@ -662,7 +662,7 @@ namespace AStar
             return _tiles[pos.X * _mapSizeY + pos.Y];
         }
 
-        private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        private void menuStrip1_ItemClicked_1(object sender, ToolStripItemClickedEventArgs e)
         {
             ToolStripMenuItem clickedItem = e.ClickedItem as ToolStripMenuItem;
 
