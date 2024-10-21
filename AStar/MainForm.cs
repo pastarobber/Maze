@@ -17,7 +17,7 @@ namespace AStar
     {
         // 길찾기 관련 상태 업데이트 타입을 정의한 열거형
         public enum UpdateType { None, Init, Create, Build, Move, Moving };
-        public enum ToolType { None, RectShape, HeartShape, Eraser, SetStart, SetEnd };
+        public enum ToolType { None, RectShape, HeartShape, Eraser, SetStart, SetEnd }; //사각형, 하트모양, 지우개 선택했는지
 
         private bool _isCreated; // 맵 생성 여부 
         private bool _isStarted; // 길찾기 시작 여부
@@ -27,11 +27,10 @@ namespace AStar
         private int _width, _height;
 
         // 각종 데이터를 저장하는 리스트들
-        //KdTree같은거 쓰면 성능 향상 있을거 같긴 함 - ㅇㅅㅂ
         private List<Tile> _tiles; // 맵의 타일들을 저장
         private List<Tile> _path; // 길찾기 경로를 저장
-        //private List<Tile> _openList; // A* 알고리즘의 open list
-        private PriorityQueue _openList;
+        //private List<Tile> _openList; 
+        private PriorityQueue _openList; // A* 알고리즘의 open list
         private List<Tile> _closeList; // A* 알고리즘의 close list
         private UpdateType _updateType; // 현재 맵의 업데이트 상황
         /*---------------------------------------------------------------------------------------*/
@@ -39,8 +38,6 @@ namespace AStar
         private HashSet<Point> _toggledTiles;
         private bool _isDrag;//드래그 여부
         private ToolType _toolType;
-        //private bool _heartShape, _rectShape, _isEraser, _isSetStartTile, _isSetEndTile;//사각형, 하트모양, 지우개 선택했는지
-        //-> ToolType Enum으로 수정
 
         /*
          * 1.열린 목록은 아직 탐색하지 않았거나, 탐색 도중 다시 고려해야 할 노드들을 저장하는 목록
@@ -80,8 +77,8 @@ namespace AStar
             // 리스트와 브러시, 폰트 등 초기화
             _tiles = new List<Tile>();
             _path = new List<Tile>();
+            //_openList = new List<Tile>(); // 전 코드
             _openList = new PriorityQueue();
-            //_openList = new List<Tile>();
             _closeList = new List<Tile>();
             _isDrag = false;
             _toggledTiles = new HashSet<Point>();
@@ -188,7 +185,6 @@ namespace AStar
         }
 
         // "시작" 버튼을 클릭했을 때 호출
-
         private void Button_start_Click(object sender, EventArgs e)
         {
             if (!_isCreated) return; // 맵이 생성되지 않았다면 길찾기 시작 불가
@@ -538,38 +534,26 @@ namespace AStar
 
         private void Tool_full_square_Click(object sender, EventArgs e)
         {
-            //_rectShape = !_rectShape;
-            //ToggleBtnHandler(rectShape: _rectShape);
             ToggleToolBtnHandler(ToolType.RectShape);
         }
 
         private void Tool_full_heart_Click(object sender, EventArgs e)
         {
-            //_heartShape = !_heartShape;
-            //ToggleBtnHandler(heartShape: _heartShape);
             ToggleToolBtnHandler(ToolType.HeartShape);
         }
 
         private void Tool_Eraser_Click(object sender, EventArgs e)
         {
-            //_isEraser = !_isEraser;
-            //ToggleBtnHandler(erase: _isEraser);
             ToggleToolBtnHandler(ToolType.Eraser);
         }
 
         private void Tool_Change_Start_Click(object sender, EventArgs e)
         {
-            //_isSetStartTile = !_isSetStartTile;
-            //ToggleBtnHandler(changeStart: _isSetStartTile);
-
             ToggleToolBtnHandler(ToolType.SetStart);
         }
 
         private void Tool_Change_End_Click(object sender, EventArgs e)
         {
-            //_isSetEndTile = !_isSetEndTile;
-            //ToggleBtnHandler(changeEnd: _isSetEndTile);
-
             ToggleToolBtnHandler(ToolType.SetEnd);
         }
 
@@ -577,17 +561,6 @@ namespace AStar
         {
             _toolType = (_toolType == toolType ? ToolType.None : toolType);
         }
-        //기존코드에서 위의 코드로 수정
-        //private void ToggleBtnHandler(bool rectShape = false, bool heartShape = false,
-        //    bool erase = false, bool changeStart = false, bool changeEnd = false)
-        //{
-        //    // 공통 동작: 다른 기능들을 비활성화
-        //    _isEraser = erase;
-        //    _rectShape = rectShape;
-        //    _heartShape = heartShape;
-        //    _isSetStartTile = changeStart;
-        //    _isSetEndTile = changeEnd;
-        //}
 
         private void SetStartTile(Point pos)
         {
@@ -608,6 +581,11 @@ namespace AStar
             _startTile.Text = "START";
             _startTile.DeleteParent();
             _toolType = ToolType.None;
+            foreach (ToolStripMenuItem item in menuStrip1.Items)
+            {
+                if (item.Name == "Tool_Change_Start")
+                    item.BackColor = Color.Transparent;
+            }
         }
         private void SetEndTile(Point pos)
         {
@@ -627,9 +605,14 @@ namespace AStar
             _endTile.Text = "END";
             _endTile.DeleteParent();
             _toolType = ToolType.None;
+
+            foreach (ToolStripMenuItem item in menuStrip1.Items)
+            {
+                if (item.Name == "Tool_Change_End")
+                    item.BackColor = Color.Transparent;
+            }
         }
         #endregion
-
 
         #region Private Method
         // 맵을 갱신하는 메서드
@@ -668,22 +651,40 @@ namespace AStar
 
             if (clickedItem != null)
             {
-                // 선택된 메뉴 항목의 시각적 표시 (배경색 변경)
-
+                // 선택된 메뉴 항목의 시각적 표시 (배경색과 테두리 변경)
                 if (clickedItem.BackColor == Color.LightBlue)
                 {
                     clickedItem.BackColor = Color.Transparent; // 선택 해제 (기본 색으로 변경)
+                    clickedItem.Paint -= MenuItem_Paint; // 테두리 제거
                     return;
                 }
 
                 clickedItem.BackColor = Color.LightBlue;
-                // 다른 메뉴 항목들의 배경색 초기화
+                clickedItem.Paint += MenuItem_Paint; // 테두리 그리기 이벤트 추가
+
+                // 다른 메뉴 항목들의 배경색 및 테두리 초기화
                 foreach (ToolStripMenuItem item in menuStrip1.Items)
                 {
                     if (item != clickedItem)
                     {
                         item.BackColor = Color.Transparent; // 기본 색으로 초기화
+                        item.Paint -= MenuItem_Paint; // 기존에 있던 테두리 제거
                     }
+                }
+            }
+        }
+
+        // 선택된 메뉴 항목에 대해 직선 테두리를 그리는 Paint 이벤트 핸들러
+        private void MenuItem_Paint(object sender, PaintEventArgs e)
+        {
+            ToolStripMenuItem menuItem = sender as ToolStripMenuItem;
+            if (menuItem != null && menuItem.BackColor == Color.LightBlue)
+            {
+                // 직선 사각형 테두리 그리기
+                using (Pen pen = new Pen(Color.DarkBlue, 1)) // 1px 굵기의 검정색 펜
+                {
+                    e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.None; // 직선 테두리
+                    e.Graphics.DrawRectangle(pen, new Rectangle(0, 0, menuItem.Width - 1, menuItem.Height - 1));
                 }
             }
         }
