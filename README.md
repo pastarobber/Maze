@@ -31,12 +31,13 @@
 
 - <p> 간략한 초기 화면
 <br>
-![image](https://github.com/user-attachments/assets/e9e47b00-2249-4331-b55c-2ab17335559c)
 
+![image](https://github.com/user-attachments/assets/e9e47b00-2249-4331-b55c-2ab17335559c)
 - <p> 메뉴바를 사용한 도장 사용, 출발 및 도착 위치 변경 후의 모습
 <br>
-![image](https://github.com/user-attachments/assets/bc1516fd-1d5d-4b20-8f90-e7d7d3f8d1a2)
 
+![image](https://github.com/user-attachments/assets/bc1516fd-1d5d-4b20-8f90-e7d7d3f8d1a2)
 - <p> 원래 코드는 최대 크기일때 미로 찾는 속도가 느렸지만 성능 개선 후 미로 찾는 속도가 급격히 빨라짐
 <br>
+
 ![image](https://github.com/user-attachments/assets/20e47a2e-6524-4cf2-999c-c573f73905e0)
