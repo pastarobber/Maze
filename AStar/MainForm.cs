@@ -17,26 +17,30 @@ namespace AStar
     {
         // 길찾기 관련 상태 업데이트 타입을 정의한 열거형
         public enum UpdateType { None, Init, Create, Build, Move, Moving };
-        public enum ToolType { None, RectShape, HeartShape, Eraser, SetStart, SetEnd }; //사각형, 하트모양, 지우개 선택했는지
+        public enum ToolType { None, RectShape, HeartShape, Eraser, SetStart, SetEnd };
 
         private bool _isCreated; // 맵 생성 여부 
         private bool _isStarted; // 길찾기 시작 여부
-        private bool _isDrag;//드래그 여부
 
         private int _mapSizeX; // 맵의 X축 크기
         private int _mapSizeY; // 맵의 Y축 크기
         private int _width, _height;
 
         // 각종 데이터를 저장하는 리스트들
+        //KdTree같은거 쓰면 성능 향상 있을거 같긴 함 - ㅇㅅㅂ
         private List<Tile> _tiles; // 맵의 타일들을 저장
         private List<Tile> _path; // 길찾기 경로를 저장
-        //private List<Tile> _openList; 
-        private PriorityQueue _openList; // A* 알고리즘의 open list
+        //private List<Tile> _openList; // A* 알고리즘의 open list
+        private PriorityQueue _openList;
         private List<Tile> _closeList; // A* 알고리즘의 close list
         private UpdateType _updateType; // 현재 맵의 업데이트 상황
+        /*---------------------------------------------------------------------------------------*/
         private Tile _startTile, _endTile;
         private HashSet<Point> _toggledTiles;
+        private bool _isDrag;//드래그 여부
         private ToolType _toolType;
+        //private bool _heartShape, _rectShape, _isEraser, _isSetStartTile, _isSetEndTile;//사각형, 하트모양, 지우개 선택했는지
+        //-> ToolType Enum으로 수정
 
         /*
          * 1.열린 목록은 아직 탐색하지 않았거나, 탐색 도중 다시 고려해야 할 노드들을 저장하는 목록
@@ -54,6 +58,7 @@ namespace AStar
         private Pen _pen;
         private Font _font;
         private Font _menufont;
+
 
         #region Constructor
         // MainForm의 생성자. 폼을 초기화
@@ -239,7 +244,7 @@ namespace AStar
                         //Priority Queue를 min heap으로 구현했고,
                         //pq에 넣으면서 다시 heapify를 하는데, 이때 계산안하고 넣으면 F, G, H 다 쓰레기값 들어가있어서
                         //pq가 제대로 동작을안함.
-                        //이거 때문에 2시간 씀
+                        //이거 떄문에 2시간 씀
                         _openList.Enqueue(target);
                     }
                     else
@@ -433,10 +438,10 @@ namespace AStar
 
             string actionType = "";
 
-            if (_toolType==ToolType.RectShape && isOnceClicked) actionType = "CreateRectObstacle";
-            else if (_toolType==ToolType.HeartShape && isOnceClicked) actionType = "CreateHeartObstacle";
-            else if (_toolType==ToolType.SetStart && isOnceClicked) actionType = "SetStartTile";
-            else if (_toolType==ToolType.SetEnd && isOnceClicked) actionType = "SetEndTile";
+            if (_toolType == ToolType.RectShape && isOnceClicked) actionType = "CreateRectObstacle";
+            else if (_toolType == ToolType.HeartShape && isOnceClicked) actionType = "CreateHeartObstacle";
+            else if (_toolType == ToolType.SetStart && isOnceClicked) actionType = "SetStartTile";
+            else if (_toolType == ToolType.SetEnd && isOnceClicked) actionType = "SetEndTile";
             else if (isOnceClicked) actionType = "SingleClick";
             else if (_isDrag) actionType = "Drag";
 
@@ -533,26 +538,38 @@ namespace AStar
 
         private void Tool_full_square_Click(object sender, EventArgs e)
         {
+            //_rectShape = !_rectShape;
+            //ToggleBtnHandler(rectShape: _rectShape);
             ToggleToolBtnHandler(ToolType.RectShape);
         }
 
         private void Tool_full_heart_Click(object sender, EventArgs e)
         {
+            //_heartShape = !_heartShape;
+            //ToggleBtnHandler(heartShape: _heartShape);
             ToggleToolBtnHandler(ToolType.HeartShape);
         }
-        
+
         private void Tool_Eraser_Click(object sender, EventArgs e)
         {
+            //_isEraser = !_isEraser;
+            //ToggleBtnHandler(erase: _isEraser);
             ToggleToolBtnHandler(ToolType.Eraser);
         }
 
         private void Tool_Change_Start_Click(object sender, EventArgs e)
         {
+            //_isSetStartTile = !_isSetStartTile;
+            //ToggleBtnHandler(changeStart: _isSetStartTile);
+
             ToggleToolBtnHandler(ToolType.SetStart);
         }
 
         private void Tool_Change_End_Click(object sender, EventArgs e)
         {
+            //_isSetEndTile = !_isSetEndTile;
+            //ToggleBtnHandler(changeEnd: _isSetEndTile);
+
             ToggleToolBtnHandler(ToolType.SetEnd);
         }
 
@@ -560,6 +577,17 @@ namespace AStar
         {
             _toolType = (_toolType == toolType ? ToolType.None : toolType);
         }
+        //기존코드에서 위의 코드로 수정
+        //private void ToggleBtnHandler(bool rectShape = false, bool heartShape = false,
+        //    bool erase = false, bool changeStart = false, bool changeEnd = false)
+        //{
+        //    // 공통 동작: 다른 기능들을 비활성화
+        //    _isEraser = erase;
+        //    _rectShape = rectShape;
+        //    _heartShape = heartShape;
+        //    _isSetStartTile = changeStart;
+        //    _isSetEndTile = changeEnd;
+        //}
 
         private void SetStartTile(Point pos)
         {
@@ -602,6 +630,7 @@ namespace AStar
         }
         #endregion
 
+
         #region Private Method
         // 맵을 갱신하는 메서드
         private void UpdateMap(UpdateType type)
@@ -631,6 +660,32 @@ namespace AStar
         private Tile FindTile(Point pos)
         {
             return _tiles[pos.X * _mapSizeY + pos.Y];
+        }
+
+        private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+            ToolStripMenuItem clickedItem = e.ClickedItem as ToolStripMenuItem;
+
+            if (clickedItem != null)
+            {
+                // 선택된 메뉴 항목의 시각적 표시 (배경색 변경)
+
+                if (clickedItem.BackColor == Color.LightBlue)
+                {
+                    clickedItem.BackColor = Color.Transparent; // 선택 해제 (기본 색으로 변경)
+                    return;
+                }
+
+                clickedItem.BackColor = Color.LightBlue;
+                // 다른 메뉴 항목들의 배경색 초기화
+                foreach (ToolStripMenuItem item in menuStrip1.Items)
+                {
+                    if (item != clickedItem)
+                    {
+                        item.BackColor = Color.Transparent; // 기본 색으로 초기화
+                    }
+                }
+            }
         }
 
         // 주어진 좌표(pos)가 현재 맵의 경계 내에 있는지를 확인
