@@ -10,7 +10,7 @@
 - 🧶**개발 소개**
   <br> A* 알고리즘을 사용하여 도장(메뉴바)을 활용해 직접 미로를 개조하며 즐거움을 느낄 수 있는 미로 찾기를 개발했습니다. 또한, 알고리즘을 더욱 잘 이해하기 위해 구조를 분석하고 추가로 성능 개선 작업도 했습니다.
 
-- 🧑🏻‍💻**사용 기술**
+- 🧑🏻‍💻**사용 언어 및 개발환경**
   <br> ![C#](https://img.shields.io/badge/-C%23-239120?style=flat-square&logo=csharp&logoColor=white)
   ![Visual Studio](https://img.shields.io/badge/-Visual%20Studio-5C2D91?style=flat-square&logo=visual-studio&logoColor=white)
   
